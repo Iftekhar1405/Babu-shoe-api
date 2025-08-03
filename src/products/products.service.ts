@@ -10,15 +10,7 @@ export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     private readonly categoriesService: CategoriesService,
-  ) {
-    this.seedProducts();
-  }
-
-  private async seedProducts() {
-
-    return await this.categoriesService.findAll();
-
-  }
+  ) { }
 
   async findAll(categoryId?: string, search?: string): Promise<Product[]> {
     const filter: any = {};
@@ -34,7 +26,7 @@ export class ProductsService {
       ];
     }
 
-    return this.productModel.find(filter).populate('categoryId').exec();
+    return await this.productModel.find(filter).populate('categoryId').exec();
   }
 
   async findOne(id: string): Promise<Product> {

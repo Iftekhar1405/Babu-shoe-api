@@ -22,10 +22,6 @@ let ProductsService = class ProductsService {
     constructor(productModel, categoriesService) {
         this.productModel = productModel;
         this.categoriesService = categoriesService;
-        this.seedProducts();
-    }
-    async seedProducts() {
-        return await this.categoriesService.findAll();
     }
     async findAll(categoryId, search) {
         const filter = {};
@@ -38,7 +34,7 @@ let ProductsService = class ProductsService {
                 { articleNo: { $regex: search, $options: 'i' } },
             ];
         }
-        return this.productModel.find(filter).populate('categoryId').exec();
+        return await this.productModel.find(filter).populate('categoryId').exec();
     }
     async findOne(id) {
         const product = await this.productModel.findById(id).populate('categoryId').exec();

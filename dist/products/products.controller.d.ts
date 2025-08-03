@@ -3,21 +3,21 @@ import { CreateProductDto } from './dto/create-product.dto';
 export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
-    create(createProductDto: CreateProductDto): {
+    create(createProductDto: CreateProductDto): Promise<{
         success: boolean;
-        data: Promise<import("./schemas/product.schema").Product>;
+        data: import("./schemas/product.schema").Product;
         message: string;
-    };
-    findAll(categoryId?: string, search?: string): {
+    }>;
+    findAll(categoryId?: string, search?: string): Promise<{
         success: boolean;
-        data: Promise<import("./schemas/product.schema").Product[]>;
-    };
-    findOne(id: string): {
+        data: import("./schemas/product.schema").Product[];
+    }>;
+    findOne(id: string): Promise<{
         success: boolean;
-        data: Promise<import("./schemas/product.schema").Product>;
-    };
-    remove(id: string): {
+        data: import("./schemas/product.schema").Product;
+    }>;
+    remove(id: string): Promise<{
         success: boolean;
         message: string;
-    };
+    }>;
 }

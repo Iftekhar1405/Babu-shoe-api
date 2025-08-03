@@ -12,11 +12,11 @@ import { CreateProductDto } from './dto/create-product.dto';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    const product = this.productsService.create(createProductDto);
+  async create(@Body() createProductDto: CreateProductDto) {
+    const product = await this.productsService.create(createProductDto);
     return {
       success: true,
       data: product,
@@ -25,11 +25,11 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(
+  async findAll(
     @Query('category') categoryId?: string,
     @Query('search') search?: string,
   ) {
-    const products = this.productsService.findAll(categoryId, search);
+    const products = await this.productsService.findAll(categoryId, search);
     return {
       success: true,
       data: products,
@@ -37,8 +37,8 @@ export class ProductsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    const product = this.productsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const product = await this.productsService.findOne(id);
     return {
       success: true,
       data: product,
@@ -46,8 +46,8 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    this.productsService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.productsService.remove(id);
     return {
       success: true,
       message: 'Product deleted successfully',
