@@ -12,11 +12,11 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) { }
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    const category = this.categoriesService.create(createCategoryDto);
+  async create(@Body() createCategoryDto: CreateCategoryDto) {
+    const category = await this.categoriesService.create(createCategoryDto);
     return {
       success: true,
       data: category,
@@ -25,8 +25,8 @@ export class CategoriesController {
   }
 
   @Get()
-  findAll() {
-    const categories = this.categoriesService.findAll();
+  async findAll() {
+    const categories = await this.categoriesService.findAll();
     return {
       success: true,
       data: categories,
@@ -34,8 +34,8 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    const category = this.categoriesService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const category = await this.categoriesService.findOne(id);
     return {
       success: true,
       data: category,
@@ -43,8 +43,8 @@ export class CategoriesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    this.categoriesService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.categoriesService.remove(id);
     return {
       success: true,
       message: 'Category deleted successfully',

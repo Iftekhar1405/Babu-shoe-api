@@ -20,30 +20,30 @@ let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
     }
-    create(createCategoryDto) {
-        const category = this.categoriesService.create(createCategoryDto);
+    async create(createCategoryDto) {
+        const category = await this.categoriesService.create(createCategoryDto);
         return {
             success: true,
             data: category,
             message: 'Category created successfully',
         };
     }
-    findAll() {
-        const categories = this.categoriesService.findAll();
+    async findAll() {
+        const categories = await this.categoriesService.findAll();
         return {
             success: true,
             data: categories,
         };
     }
-    findOne(id) {
-        const category = this.categoriesService.findOne(id);
+    async findOne(id) {
+        const category = await this.categoriesService.findOne(id);
         return {
             success: true,
             data: category,
         };
     }
-    remove(id) {
-        this.categoriesService.remove(id);
+    async remove(id) {
+        await this.categoriesService.remove(id);
         return {
             success: true,
             message: 'Category deleted successfully',
@@ -56,27 +56,27 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "remove", null);
 exports.CategoriesController = CategoriesController = __decorate([
     (0, common_1.Controller)('categories'),
