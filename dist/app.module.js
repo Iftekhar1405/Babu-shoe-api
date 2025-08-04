@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
 const categories_module_1 = require("./categories/categories.module");
 const products_module_1 = require("./products/products.module");
@@ -17,7 +18,11 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forRoot('mongodb+srv://iftekharahmedxyz:helloworld@cluster0.uleqf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'),
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+            }),
+            mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI ||
+                "mongodb+srv://iftekharahmedxyz:helloworld@cluster0.uleqf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"),
             categories_module_1.CategoriesModule,
             products_module_1.ProductsModule,
         ],

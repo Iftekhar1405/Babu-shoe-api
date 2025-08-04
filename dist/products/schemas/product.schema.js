@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductSchema = exports.Product = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const product_color_image_schema_1 = require("./product-color-image.schema");
 let Product = class Product {
 };
 exports.Product = Product;
@@ -20,7 +21,7 @@ __decorate([
     __metadata("design:type", String)
 ], Product.prototype, "name", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: false }),
     __metadata("design:type", String)
 ], Product.prototype, "image", void 0);
 __decorate([
@@ -28,13 +29,17 @@ __decorate([
     __metadata("design:type", Number)
 ], Product.prototype, "price", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Category', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: "Category", required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Product.prototype, "categoryId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true, maxlength: 50 }),
     __metadata("design:type", String)
 ], Product.prototype, "articleNo", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [product_color_image_schema_1.ProductColorImageSchema], default: [], required: false }),
+    __metadata("design:type", Array)
+], Product.prototype, "colors", void 0);
 exports.Product = Product = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Product);

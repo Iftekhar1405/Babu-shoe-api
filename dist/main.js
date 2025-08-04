@@ -16,8 +16,8 @@ async function bootstrap() {
         transform: true,
     }));
     app.setGlobalPrefix('api');
-    await app.listen(3001);
-    console.log('🚀 Backend server running on http://localhost:3001');
+    await app.listen(8080);
+    console.log('🚀 Backend server running on http://localhost:8080');
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

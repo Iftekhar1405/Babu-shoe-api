@@ -1,4 +1,5 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types } from "mongoose";
+import { ProductColorImage } from "./product-color-image.schema";
 export type ProductDocument = Product & Document;
 export declare class Product {
     name: string;
@@ -6,6 +7,7 @@ export declare class Product {
     price: number;
     categoryId: Types.ObjectId;
     articleNo: string;
+    colors: ProductColorImage[];
 }
 export declare const ProductSchema: import("mongoose").Schema<Product, import("mongoose").Model<Product, any, any, any, Document<unknown, any, Product, any, {}> & Product & {
     _id: Types.ObjectId;

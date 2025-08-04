@@ -1,14 +1,31 @@
-import { IsString, IsUrl, IsNotEmpty, IsNumber, IsPositive, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsUrl,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  MaxLength,
+  IsArray,
+  IsOptional,
+  ValidateNested,
+} from "class-validator";
+import { Type } from "class-transformer";
+
+export class ProductColorImageDto {
+  @IsString()
+  @IsNotEmpty()
+  color: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  urls: string[];
+}
 
 export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(200)
   name: string;
-
-  @IsUrl()
-  @IsNotEmpty()
-  image: string;
 
   @IsNumber()
   @IsPositive()
@@ -22,4 +39,10 @@ export class CreateProductDto {
   @IsNotEmpty()
   @MaxLength(50)
   articleNo: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProductColorImageDto)
+  colors?: ProductColorImageDto[];
 }

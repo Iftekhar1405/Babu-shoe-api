@@ -9,8 +9,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateProductDto = void 0;
+exports.CreateProductDto = exports.ProductColorImageDto = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
+class ProductColorImageDto {
+}
+exports.ProductColorImageDto = ProductColorImageDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], ProductColorImageDto.prototype, "color", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], ProductColorImageDto.prototype, "urls", void 0);
 class CreateProductDto {
 }
 exports.CreateProductDto = CreateProductDto;
@@ -20,11 +34,6 @@ __decorate([
     (0, class_validator_1.MaxLength)(200),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "name", void 0);
-__decorate([
-    (0, class_validator_1.IsUrl)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CreateProductDto.prototype, "image", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsPositive)(),
@@ -41,4 +50,11 @@ __decorate([
     (0, class_validator_1.MaxLength)(50),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "articleNo", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => ProductColorImageDto),
+    __metadata("design:type", Array)
+], CreateProductDto.prototype, "colors", void 0);
 //# sourceMappingURL=create-product.dto.js.map
