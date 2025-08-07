@@ -1,22 +1,46 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { CategoriesModule } from "./categories/categories.module";
 import { ProductsModule } from "./products/products.module";
+import { AuthModule } from "./auth/auth.module";
+import { UsersModule } from "./users/users.module";
+import { UsersService } from "./users/users.service";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(
-      process.env.MONGODB_URI ||
-        "mongodb+srv://iftekharahmedxyz:helloworld@cluster0.uleqf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-    ),
+    // MongooseModule.forRoot(
+    //   process.env.MONGODB_URI ||
+    //     ""
+    // ),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>("MONGODB_URI"),
+      }),
+      inject: [ConfigService],
+    }),
+    AuthModule,
+    UsersModule,
     CategoriesModule,
     ProductsModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private usersService: UsersService) {}
+
+  async onModuleInit() {
+    // Create default admin user on application startup
+    try {
+      await this.usersService.createAdminUser();
+      console.log("✅ Default admin user created/verified");
+    } catch (error) {
+      console.error("❌ Error creating admin user:", error.message);
+    }
+  }
+}
