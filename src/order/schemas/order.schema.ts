@@ -3,6 +3,25 @@ import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
 export type OrderDocument = Order & Document;
 
+
+export enum ORDER_STATUS {
+    'pending',
+    'confirmed',
+    'packed',
+    'dispatched',
+    'outfordeliver',
+    'delivered',
+    'cancelled',
+    'return',
+}
+
+export enum ORDER_MODE { 'offline', 'online' }
+
+export enum ORDER_PAYMENT_MODE { 'UPI', 'Cash', 'credit' }
+
+export enum ORDER_CANCELATION_REASON { 'customer_cancel', 'inventory_issue', 'others' }
+
+export enum ORDER_RETURN_REASON { 'damaged', 'wrong_product', 'others' }
 @Schema()
 class ProductDetail {
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Project', required: true })
@@ -19,6 +38,9 @@ class ProductDetail {
 
     @Prop({ required: true })
     discountPercent: number;
+
+    @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
+    salesPerson: Types.ObjectId;
 }
 
 @Schema()
@@ -38,11 +60,11 @@ export class Order {
     @Prop({ type: [ProductDetail], required: true, _id: false })
     productDetails: ProductDetail[];
 
-    @Prop({ enum: ['offline', 'online'], required: true })
-    mode: 'offline' | 'online';
+    @Prop({ enum: ORDER_MODE, required: true })
+    mode: string;
 
-    @Prop({ enum: ['UPI', 'Cash', 'credit'], required: true })
-    paymentMode: 'UPI' | 'Cash' | 'credit';
+    @Prop({ enum: ORDER_PAYMENT_MODE, required: true })
+    paymentMode: string;
 
     @Prop({ required: true })
     orderNumber: number;
@@ -51,36 +73,19 @@ export class Order {
     address: Types.ObjectId;
 
     @Prop({
-        enum: [
-            'pending',
-            'confirmed',
-            'packed',
-            'dispatched',
-            'outfordeliver',
-            'delivered',
-            'cancelled',
-            'return',
-        ],
+        enum: ORDER_STATUS,
         default: 'pending',
     })
-    status:
-        | 'pending'
-        | 'confirmed'
-        | 'packed'
-        | 'dispatched'
-        | 'outfordeliver'
-        | 'delivered'
-        | 'cancelled'
-        | 'return';
+    status: string
 
-    @Prop({ enum: ['customer_cancel', 'inventory_issue', 'others'], required: false })
-    cancelationReason?: 'customer_cancel' | 'inventory_issue' | 'others';
+    @Prop({ enum: ORDER_CANCELATION_REASON, required: false })
+    cancelationReason?: string;
 
     @Prop({ required: false })
     cancelationDescription?: string;
 
-    @Prop({ enum: ['damaged', 'wrong_product', 'others'], required: false })
-    returnReason?: 'damaged' | 'wrong_product' | 'others';
+    @Prop({ enum: ORDER_RETURN_REASON, required: false })
+    returnReason?: string;
 
     @Prop({ required: false })
     returnDescription?: string;
@@ -102,6 +107,7 @@ export class Order {
 
     @Prop({ type: [Comment], default: [], _id: false })
     comments: Comment[];
+
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
