@@ -12,6 +12,7 @@ const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
 const categories_module_1 = require("./categories/categories.module");
 const products_module_1 = require("./products/products.module");
+const order_module_1 = require("./order/order.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -25,6 +26,7 @@ exports.AppModule = AppModule = __decorate([
                 "mongodb+srv://iftekharahmedxyz:helloworld@cluster0.uleqf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"),
             categories_module_1.CategoriesModule,
             products_module_1.ProductsModule,
+            order_module_1.OrderModule,
         ],
         controllers: [],
         providers: [],
