@@ -10,6 +10,7 @@ import {
     IsDateString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ORDER_CANCELATION_REASON, ORDER_MODE, ORDER_PAYMENT_MODE, ORDER_RETURN_REASON, ORDER_STATUS } from '../schemas/order.schema';
 
 class ProductDetailDto {
     @IsMongoId()
@@ -44,44 +45,24 @@ class CommentDto {
 }
 
 export class CreateOrderDto {
-    @IsMongoId()
-    @IsNotEmpty()
-    user: string;
 
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => ProductDetailDto)
     productDetails: ProductDetailDto[];
 
-    @IsEnum(['offline', 'online'])
-    mode: 'offline' | 'online';
+    @IsEnum(ORDER_MODE)
+    mode: string;
 
-    @IsEnum(['UPI', 'Cash', 'credit'])
-    paymentMode: 'UPI' | 'Cash' | 'credit';
-
-    // `orderNumber` is auto-calculated in service, so it's optional here
-    @IsOptional()
-    @IsNumber()
-    orderNumber?: number;
+    @IsEnum(ORDER_PAYMENT_MODE)
+    paymentMode: string;
 
     @IsMongoId()
     @IsNotEmpty()
     address: string;
 
-    @IsEnum([
-        'pending',
-        'confirmed',
-        'packed',
-        'dispatched',
-        'outfordeliver',
-        'delivered',
-        'cancelled',
-        'return',
-    ])
-    status: string;
-
     @IsOptional()
-    @IsEnum(['customer_cancel', 'inventory_issue', 'others'])
+    @IsEnum(ORDER_CANCELATION_REASON)
     cancelationReason?: string;
 
     @IsOptional()
@@ -89,7 +70,7 @@ export class CreateOrderDto {
     cancelationDescription?: string;
 
     @IsOptional()
-    @IsEnum(['damaged', 'wrong_product', 'others'])
+    @IsEnum(ORDER_RETURN_REASON)
     returnReason?: string;
 
     @IsOptional()
