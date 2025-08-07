@@ -4,6 +4,9 @@ import {
   ProductColorImage,
   ProductColorImageSchema,
 } from "./product-color-image.schema";
+import { Type } from "class-transformer";
+import { Comapny } from "./company.schema";
+import { Tags } from "./tags.schema";
 
 export type ProductDocument = Product & Document;
 
@@ -14,6 +17,9 @@ export class Product {
 
   @Prop({ required: false })
   image: string;
+
+  @Prop({ required: false })
+  description: string;
 
   @Prop({ required: true, min: 0 })
   price: number;
@@ -26,6 +32,19 @@ export class Product {
 
   @Prop({ type: [ProductColorImageSchema], default: [], required: false })
   colors: ProductColorImage[];
+
+  @Prop({ type: Types.ObjectId, ref: Comapny.name })
+  companyId: Types.ObjectId
+
+  @Prop({ type: [String] })
+  sizes: string[]
+
+  @Prop({ type: Boolean, default: true })
+  inStock: boolean
+
+  @Prop({ type: [Types.ObjectId], ref: Tags.name })
+  tags: Types.ObjectId[]
+
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
