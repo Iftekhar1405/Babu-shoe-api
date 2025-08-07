@@ -3,6 +3,7 @@ export type ProductColorImageDocument = ProductColorImage & Document;
 export declare class ProductColorImage {
     color: string;
     urls: string[];
+    availableSize: string[];
 }
 export declare const ProductColorImageSchema: import("mongoose").Schema<ProductColorImage, import("mongoose").Model<ProductColorImage, any, any, any, Document<unknown, any, ProductColorImage, any, {}> & ProductColorImage & {
     _id: import("mongoose").Types.ObjectId;

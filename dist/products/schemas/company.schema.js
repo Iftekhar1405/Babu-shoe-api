@@ -9,25 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductColorImageSchema = exports.ProductColorImage = void 0;
+exports.CompanySchema = exports.Comapny = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-let ProductColorImage = class ProductColorImage {
+let Comapny = class Comapny {
 };
-exports.ProductColorImage = ProductColorImage;
+exports.Comapny = Comapny;
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, maxlength: 200 }),
     __metadata("design:type", String)
-], ProductColorImage.prototype, "color", void 0);
+], Comapny.prototype, "name", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [String], required: true, default: [] }),
-    __metadata("design:type", Array)
-], ProductColorImage.prototype, "urls", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: [String] }),
-    __metadata("design:type", Array)
-], ProductColorImage.prototype, "availableSize", void 0);
-exports.ProductColorImage = ProductColorImage = __decorate([
-    (0, mongoose_1.Schema)({ _id: false })
-], ProductColorImage);
-exports.ProductColorImageSchema = mongoose_1.SchemaFactory.createForClass(ProductColorImage);
-//# sourceMappingURL=product-color-image.schema.js.map
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], Comapny.prototype, "logo", void 0);
+exports.Comapny = Comapny = __decorate([
+    (0, mongoose_1.Schema)({ timestamps: true })
+], Comapny);
+exports.CompanySchema = mongoose_1.SchemaFactory.createForClass(Comapny);
+//# sourceMappingURL=company.schema.js.map

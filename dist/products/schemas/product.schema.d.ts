@@ -4,10 +4,15 @@ export type ProductDocument = Product & Document;
 export declare class Product {
     name: string;
     image: string;
+    description: string;
     price: number;
     categoryId: Types.ObjectId;
     articleNo: string;
     colors: ProductColorImage[];
+    companyId: Types.ObjectId;
+    sizes: string[];
+    inStock: boolean;
+    tags: Types.ObjectId[];
 }
 export declare const ProductSchema: import("mongoose").Schema<Product, import("mongoose").Model<Product, any, any, any, Document<unknown, any, Product, any, {}> & Product & {
     _id: Types.ObjectId;

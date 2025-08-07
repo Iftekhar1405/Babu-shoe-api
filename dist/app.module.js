@@ -18,6 +18,7 @@ const products_module_1 = require("./products/products.module");
 const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const users_service_1 = require("./users/users.service");
+const order_module_1 = require("./order/order.module");
 let AppModule = class AppModule {
     constructor(usersService) {
         this.usersService = usersService;
@@ -50,6 +51,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             categories_module_1.CategoriesModule,
             products_module_1.ProductsModule,
+            order_module_1.OrderModule,
         ],
         controllers: [],
         providers: [],

@@ -10,6 +10,9 @@ export class ProductColorImage {
 
   @Prop({ type: [String], required: true, default: [] })
   urls: string[];
+
+  @Prop({ type: [String] })
+  availableSize: string[]
 }
 
 export const ProductColorImageSchema =
