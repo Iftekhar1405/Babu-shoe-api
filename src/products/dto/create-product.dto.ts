@@ -1,6 +1,5 @@
 import {
   IsString,
-  IsUrl,
   IsNotEmpty,
   IsNumber,
   IsPositive,
@@ -8,6 +7,8 @@ import {
   IsArray,
   IsOptional,
   ValidateNested,
+  IsMongoId,
+  IsBoolean,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -19,6 +20,10 @@ export class ProductColorImageDto {
   @IsArray()
   @IsString({ each: true })
   urls: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  availableSize: string[];
 }
 
 export class CreateProductDto {
@@ -27,11 +32,19 @@ export class CreateProductDto {
   @MaxLength(200)
   name: string;
 
+  @IsOptional()
+  @IsString()
+  image?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
   @IsNumber()
   @IsPositive()
   price: number;
 
-  @IsString()
+  @IsMongoId()
   @IsNotEmpty()
   categoryId: string;
 
@@ -45,4 +58,22 @@ export class CreateProductDto {
   @ValidateNested({ each: true })
   @Type(() => ProductColorImageDto)
   colors?: ProductColorImageDto[];
+
+  @IsOptional()
+  // @IsMongoId()
+  companyId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  sizes?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  inStock?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  // @IsMongoId({ each: true })
+  tags?: string[];
 }
