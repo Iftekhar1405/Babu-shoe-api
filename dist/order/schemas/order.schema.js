@@ -69,7 +69,7 @@ __decorate([
     __metadata("design:type", Number)
 ], ProductDetail.prototype, "discountPercent", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User', required: false }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], ProductDetail.prototype, "salesPerson", void 0);
 ProductDetail = __decorate([

@@ -39,7 +39,7 @@ class ProductDetail {
     @Prop({ required: true })
     discountPercent: number;
 
-    @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
+    @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: false })
     salesPerson: Types.ObjectId;
 }
 
