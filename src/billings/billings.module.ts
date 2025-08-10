@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
-import { BillService } from "./billings.service";
-import { BillController } from "./billings.controller";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Bill, BillSchema } from "./schemas/billing.schemas";
 import { Product, ProductSchema } from "src/products/schemas/product.schema";
+import { BillService } from "./billings.services";
+import { BillController } from "./billings.controller";
 
 @Module({
   imports: [
@@ -14,5 +14,6 @@ import { Product, ProductSchema } from "src/products/schemas/product.schema";
   ],
   controllers: [BillController],
   providers: [BillService],
+  exports: [BillService],
 })
-export class BillingsModule {}
+export class BillModule {}

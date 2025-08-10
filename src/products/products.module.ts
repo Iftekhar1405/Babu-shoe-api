@@ -7,10 +7,16 @@ import { Product, ProductSchema } from "./schemas/product.schema";
 import { CategoriesModule } from "../categories/categories.module";
 import { CloudinaryService } from "./services/cloudinary.service";
 import { DynamicFilesInterceptor } from "./interceptors/dynamic-files.interceptor";
+import { Comapny, CompanySchema } from "./schemas/company.schema";
+import { Tags, TagSchema } from "./schemas/tags.schema";
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
+    MongooseModule.forFeature([
+      { name: Product.name, schema: ProductSchema },
+      { name: Comapny.name, schema: CompanySchema },
+      { name: Tags.name, schema: TagSchema },
+    ]),
     CategoriesModule,
   ],
   controllers: [ProductsController, ImageUploadController],

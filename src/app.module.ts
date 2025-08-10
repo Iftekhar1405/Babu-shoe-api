@@ -6,8 +6,8 @@ import { ProductsModule } from "./products/products.module";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { UsersService } from "./users/users.service";
-import { OrderModule } from './order/order.module';
-import { BillingsModule } from './billings/billings.module';
+import { OrderModule } from "./order/order.module";
+import { BillModule } from "./billings/billings.module";
 
 @Module({
   imports: [
@@ -30,7 +30,7 @@ import { BillingsModule } from './billings/billings.module';
     CategoriesModule,
     ProductsModule,
     OrderModule,
-    BillingsModule,
+    BillModule,
   ],
   controllers: [],
   providers: [],
