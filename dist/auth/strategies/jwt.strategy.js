@@ -21,7 +21,6 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([
                 passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
                 (request) => {
-                    console.log("🪵 ~ JwtStrategy ~ constructor ~ request:", request?.cookies);
                     return request?.cookies?.access_token;
                 },
             ]),
