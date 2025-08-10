@@ -10,4 +10,4 @@ export class Tags {
     name: string;
 }
 
-export const CompanySchema = SchemaFactory.createForClass(Tags);
+export const TagsSchema = SchemaFactory.createForClass(Tags);

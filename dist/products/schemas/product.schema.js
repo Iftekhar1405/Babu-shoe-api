@@ -13,7 +13,7 @@ exports.ProductSchema = exports.Product = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const product_color_image_schema_1 = require("./product-color-image.schema");
-const company_schema_1 = require("./company.schema");
+const company_schema_1 = require("../../company/schemas/company.schema");
 const tags_schema_1 = require("./tags.schema");
 let Product = class Product {
 };
@@ -47,7 +47,7 @@ __decorate([
     __metadata("design:type", Array)
 ], Product.prototype, "colors", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: company_schema_1.Comapny.name }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: company_schema_1.Company.name }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Product.prototype, "companyId", void 0);
 __decorate([
