@@ -7,6 +7,7 @@ import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { UsersService } from "./users/users.service";
 import { OrderModule } from './order/order.module';
+import { BillingsModule } from './billings/billings.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { OrderModule } from './order/order.module';
     CategoriesModule,
     ProductsModule,
     OrderModule,
+    BillingsModule,
   ],
   controllers: [],
   providers: [],
