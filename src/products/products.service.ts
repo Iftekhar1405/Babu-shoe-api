@@ -144,15 +144,17 @@ export class ProductsService {
       throw new ConflictException('Product with this article number already exists');
     }
 
-    // Convert string IDs to ObjectIds
-    const productData = {
-      ...createProductDto,
-      companyId: createProductDto.companyId ? new Types.ObjectId(createProductDto.companyId) : undefined,
-      tags: createProductDto.tags?.map(tagId => new Types.ObjectId(tagId)),
-      categoryId: new Types.ObjectId(createProductDto.categoryId),
-    };
+    // // Convert string IDs to ObjectIds
+    // const productData = {
+    //   ...createProductDto,
+    //   companyId: createProductDto.companyId ? new Types.ObjectId(createProductDto.companyId) : undefined,
+    //   tags: createProductDto.tags?.map(tagId => new Types.ObjectId(tagId)),
+    //   categoryId: new Types.ObjectId(createProductDto.categoryId),
+    // };
+    // mongoose automatically converts to object ids based on schema
 
-    const createdProduct = new this.productModel(productData);
+
+    const createdProduct = new this.productModel(createProductDto);
     const savedProduct = await createdProduct.save();
 
     // Return populated product
@@ -214,8 +216,11 @@ export class ProductsService {
   }
 
   async getTags() {
+    return await this.tagsModel.find().lean(true)
+  }
 
-    // return 
+  async createTag(name: string) {
+    return await this.tagsModel.create({ name })
   }
 
   async findByCategory(categoryId: string): Promise<Product[]> {

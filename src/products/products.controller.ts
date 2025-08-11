@@ -16,7 +16,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -50,6 +50,16 @@ export class ProductsController {
       success: true,
       data: { count },
     };
+  }
+
+  @Get('tags')
+  async getTags() {
+    return await this.productsService.getTags();
+  }
+
+  @Post('tag')
+  async createTag(@Body() data: { name: string }) {
+    return await this.productsService.createTag(data.name);
   }
 
   @Get('category/:categoryId')
