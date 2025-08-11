@@ -21,7 +21,7 @@ export class BillService {
 
     // Find existing cart for user
     let cart = await this.billModel.findOne({
-      biller: userId,
+      biller: new Types.ObjectId(userId),
       billPrinted: false,
     });
 
@@ -36,7 +36,6 @@ export class BillService {
     };
 
     if (cart) {
-      // Check if the same product with same color already exists
       const existingItemIndex = cart.items.findIndex(
         (item) =>
           item.productId.toString() === createBillDto.productId &&
@@ -44,7 +43,6 @@ export class BillService {
       );
 
       if (existingItemIndex > -1) {
-        // Update existing item quantity and recalculate final price
         cart.items[existingItemIndex].quantity += createBillDto.quantity;
         cart.items[existingItemIndex].finalPrice += createBillDto.finalPrice;
       } else {
@@ -57,17 +55,16 @@ export class BillService {
         biller: new Types.ObjectId(userId),
         items: [newItem],
         billPrinted: false,
-        totalAmount: 0, // Will be calculated below
+        totalAmount: 0, 
       });
     }
 
-    // Calculate total amount (sum of all finalPrice)
     cart.totalAmount = cart.items.reduce(
       (total, item) => total + item.finalPrice,
       0
     );
 
-    // Save and return populated cart
+ 
     const savedCart = await cart.save();
     return await this.billModel
       .findById(savedCart._id)
@@ -84,7 +81,10 @@ export class BillService {
 
   async getBill(userId: string) {
     let cart = await this.billModel
-      .findOne({ biller: new Types.ObjectId(userId), billPrinted: false })
+      .findOne({
+        biller: new Types.ObjectId(userId),
+        // billPrinted: false
+      })
       .populate({
         path: "items.productId",
         populate: [
@@ -105,6 +105,25 @@ export class BillService {
       });
       await cart.save();
     }
+
+    return cart;
+  }
+
+  async clear(userId: string) {
+    let cart = await this.billModel.findOne({
+      biller: new Types.ObjectId(userId),
+      //   billPrinted : false
+    });
+
+    if (!cart) {
+      throw new NotFoundException("Cart not found");
+    }
+
+    cart.items = [];
+    cart.totalAmount = 0;
+    cart.billPrinted = false;
+
+    await cart.save();
 
     return cart;
   }

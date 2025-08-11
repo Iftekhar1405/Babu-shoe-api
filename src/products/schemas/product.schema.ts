@@ -5,8 +5,9 @@ import {
   ProductColorImageSchema,
 } from "./product-color-image.schema";
 import { Type } from "class-transformer";
-import { Comapny } from "./company.schema";
+import { Company } from "../../company/schemas/company.schema";
 import { Tags } from "./tags.schema";
+import { compare } from "bcryptjs";
 
 export type ProductDocument = Product & Document;
 
@@ -33,7 +34,7 @@ export class Product {
   @Prop({ type: [ProductColorImageSchema], default: [], required: false })
   colors: ProductColorImage[];
 
-  @Prop({ type: Types.ObjectId, ref: Comapny.name })
+  @Prop({ type: Types.ObjectId, ref: Company.name })
   companyId: Types.ObjectId
 
   @Prop({ type: [String] })

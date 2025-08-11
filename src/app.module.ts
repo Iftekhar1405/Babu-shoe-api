@@ -8,6 +8,7 @@ import { UsersModule } from "./users/users.module";
 import { UsersService } from "./users/users.service";
 import { OrderModule } from "./order/order.module";
 import { BillModule } from "./billings/billings.module";
+import { CompanyModule } from './company/companies.module';
 
 @Module({
   imports: [
@@ -31,12 +32,14 @@ import { BillModule } from "./billings/billings.module";
     ProductsModule,
     OrderModule,
     BillModule,
+    CompanyModule,
+    CompanyModule,
   ],
   controllers: [],
   providers: [],
 })
 export class AppModule {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService) { }
 
   async onModuleInit() {
     // Create default admin user on application startup
