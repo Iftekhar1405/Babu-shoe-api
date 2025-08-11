@@ -16,13 +16,17 @@ const product_schema_1 = require("./schemas/product.schema");
 const categories_module_1 = require("../categories/categories.module");
 const cloudinary_service_1 = require("./services/cloudinary.service");
 const dynamic_files_interceptor_1 = require("./interceptors/dynamic-files.interceptor");
+const tags_schema_1 = require("./schemas/tags.schema");
 let ProductsModule = class ProductsModule {
 };
 exports.ProductsModule = ProductsModule;
 exports.ProductsModule = ProductsModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: product_schema_1.Product.name, schema: product_schema_1.ProductSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: product_schema_1.Product.name, schema: product_schema_1.ProductSchema, },
+                { name: tags_schema_1.Tags.name, schema: tags_schema_1.TagsSchema }
+            ]),
             categories_module_1.CategoriesModule,
         ],
         controllers: [products_controller_1.ProductsController, image_upload_controller_1.ImageUploadController],

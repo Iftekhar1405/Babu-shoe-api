@@ -4,11 +4,13 @@ import { Model } from 'mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { CategoriesService } from '../categories/categories.service';
+import { Tags, TagsDocument } from './schemas/tags.schema';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    @InjectModel(Tags.name) private tagsModel: Model<TagsDocument>,
     private readonly categoriesService: CategoriesService,
   ) { }
 
@@ -50,5 +52,10 @@ export class ProductsService {
     if (!result) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+  }
+
+  async getTags() {
+
+    // return 
   }
 }

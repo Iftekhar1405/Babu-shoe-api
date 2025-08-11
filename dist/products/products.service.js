@@ -18,9 +18,11 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const product_schema_1 = require("./schemas/product.schema");
 const categories_service_1 = require("../categories/categories.service");
+const tags_schema_1 = require("./schemas/tags.schema");
 let ProductsService = class ProductsService {
-    constructor(productModel, categoriesService) {
+    constructor(productModel, tagsModel, categoriesService) {
         this.productModel = productModel;
+        this.tagsModel = tagsModel;
         this.categoriesService = categoriesService;
     }
     async findAll(categoryId, search) {
@@ -54,12 +56,16 @@ let ProductsService = class ProductsService {
             throw new common_1.NotFoundException(`Product with ID ${id} not found`);
         }
     }
+    async getTags() {
+    }
 };
 exports.ProductsService = ProductsService;
 exports.ProductsService = ProductsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(product_schema_1.Product.name)),
+    __param(1, (0, mongoose_1.InjectModel)(tags_schema_1.Tags.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
         categories_service_1.CategoriesService])
 ], ProductsService);
 //# sourceMappingURL=products.service.js.map
