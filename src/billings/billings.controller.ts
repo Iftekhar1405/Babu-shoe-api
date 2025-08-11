@@ -1,55 +1,32 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpException,
-  InternalServerErrorException,
-  Param,
-  Patch,
-  Post,
-} from "@nestjs/common";
-import { BillService } from "./billings.service";
-import { Bill } from "./schemas/billing.schemas";
-import { CreateBillDto } from "./dto/create-bill.dto";
-import { ApiResponse } from "./types";
+import { Controller, Post, Get, Body, Req, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
+import { BillService } from "./billings.services";
+import { CreateBillDto } from "./dto/add-to-bill.dto";
+import { AuthenticatedRequest } from "./types";
 
-@Controller("bills")
+@Controller("bill")
+@UseGuards(JwtAuthGuard)
 export class BillController {
   constructor(private readonly billService: BillService) {}
 
-  @Post()
-  async createBill(
-    @Body() createBillDto: CreateBillDto
-  ): Promise<ApiResponse<Bill>> {
-    const bill = await this.billService.createBill(createBillDto);
-    return {
-      success: true,
-      message: "Bill createed.",
-      data: bill,
-    };
+  @Post("add")
+  async addToCart(
+    @Body() createBillDto: CreateBillDto,
+    @Req() req: AuthenticatedRequest
+  ) {
+    const userId = req.user.id;
+    return await this.billService.addToCart(userId, createBillDto);
   }
 
   @Get()
-  async getAllBills(): Promise<Bill[]> {
-    return this.billService.getAllBills();
+  async getCart(@Req() req: AuthenticatedRequest) {
+    const userId = req.user.id;
+    return await this.billService.getBill(userId);
   }
 
-  @Get(":id")
-  async getBillById(@Param("id") id: string): Promise<Bill> {
-    return this.billService.getBillById(id);
-  }
-
-  @Patch(":id")
-  async updateBill(
-    @Param("id") id: string,
-    @Body() updateData: Partial<CreateBillDto>
-  ): Promise<Bill> {
-    return this.billService.updateBill(id, updateData);
-  }
-
-  @Delete(":id")
-  async deleteBill(@Param("id") id: string): Promise<{ message: string }> {
-    return this.billService.deleteBill(id);
+  @Get("clear-all")
+  async clearAll(@Req() req: AuthenticatedRequest) {
+    const userId = req.user.id;
+    return await this.billService.clear(userId);
   }
 }

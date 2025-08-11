@@ -8,9 +8,8 @@ import {
   IsString,
   Min,
 } from "class-validator";
-import { Type } from "class-transformer";
 
-class CreateProductDetailDto {
+export class CreateBillDto {
   @IsMongoId()
   @IsNotEmpty()
   productId: string;
@@ -36,16 +35,4 @@ class CreateProductDetailDto {
   @IsOptional()
   @IsString()
   salesPerson?: string;
-}
-
-export class CreateBillDto {
-  @IsArray()
-  @Type(() => CreateProductDetailDto)
-  items: CreateProductDetailDto[];
-
-  @IsBoolean()
-  billPrinted: boolean;
-
-  @IsNumber()
-  totalAmount: number;
 }

@@ -6,8 +6,8 @@ import { ProductsModule } from "./products/products.module";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { UsersService } from "./users/users.service";
-import { OrderModule } from './order/order.module';
-import { BillingsModule } from './billings/billings.module';
+import { OrderModule } from "./order/order.module";
+import { BillModule } from "./billings/billings.module";
 import { CompanyModule } from './company/companies.module';
 
 @Module({
@@ -31,7 +31,7 @@ import { CompanyModule } from './company/companies.module';
     CategoriesModule,
     ProductsModule,
     OrderModule,
-    BillingsModule,
+    BillModule,
     CompanyModule,
     CompanyModule,
   ],

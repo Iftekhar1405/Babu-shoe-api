@@ -3,7 +3,7 @@ export type TagsDocument = Tags & Document;
 export declare class Tags {
     name: string;
 }
-export declare const TagsSchema: import("mongoose").Schema<Tags, import("mongoose").Model<Tags, any, any, any, Document<unknown, any, Tags, any, {}> & Tags & {
+export declare const TagSchema: import("mongoose").Schema<Tags, import("mongoose").Model<Tags, any, any, any, Document<unknown, any, Tags, any, {}> & Tags & {
     _id: Types.ObjectId;
 } & {
     __v: number;

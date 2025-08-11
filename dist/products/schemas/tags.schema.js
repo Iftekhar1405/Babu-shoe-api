@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TagsSchema = exports.Tags = void 0;
+exports.TagSchema = exports.Tags = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let Tags = class Tags {
 };
@@ -21,5 +21,5 @@ __decorate([
 exports.Tags = Tags = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Tags);
-exports.TagsSchema = mongoose_1.SchemaFactory.createForClass(Tags);
+exports.TagSchema = mongoose_1.SchemaFactory.createForClass(Tags);
 //# sourceMappingURL=tags.schema.js.map

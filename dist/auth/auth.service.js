@@ -35,10 +35,10 @@ let AuthService = class AuthService {
         const user = await this.usersService.findByPhoneNumber(loginDto.phoneNumber);
         const isPasswordValid = await this.usersService.validatePassword(loginDto.password, user.password);
         if (!isPasswordValid) {
-            throw new common_1.UnauthorizedException('Invalid credentials');
+            throw new common_1.UnauthorizedException("Invalid credentials");
         }
         if (!user.isActive) {
-            throw new common_1.UnauthorizedException('User account is inactive');
+            throw new common_1.UnauthorizedException("User account is inactive");
         }
         const payload = {
             sub: user._id.toString(),

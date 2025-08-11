@@ -54,7 +54,7 @@ exports.AppModule = AppModule = __decorate([
             categories_module_1.CategoriesModule,
             products_module_1.ProductsModule,
             order_module_1.OrderModule,
-            billings_module_1.BillingsModule,
+            billings_module_1.BillModule,
             companies_module_1.CompanyModule,
             companies_module_1.CompanyModule,
         ],
