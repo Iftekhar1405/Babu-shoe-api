@@ -74,6 +74,11 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsArray()
-  // @IsMongoId({ each: true })
+  @IsMongoId({ each: true })
   tags?: string[];
+
+  @IsOptional()
+  @IsArray()
+  embedding: number[]
+
 }

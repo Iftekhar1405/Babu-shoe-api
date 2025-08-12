@@ -9,6 +9,7 @@ import { UsersService } from "./users/users.service";
 import { OrderModule } from "./order/order.module";
 import { BillModule } from "./billings/billings.module";
 import { CompanyModule } from './company/companies.module';
+import { OpenaiModule } from './openai/openai.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { CompanyModule } from './company/companies.module';
     BillModule,
     CompanyModule,
     CompanyModule,
+    OpenaiModule,
   ],
   controllers: [],
   providers: [],

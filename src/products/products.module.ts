@@ -11,6 +11,8 @@ import { TagsService } from "./services/tags.service";
 import { DynamicFilesInterceptor } from "./interceptors/dynamic-files.interceptor";
 import { Company, CompanySchema } from "../company/schemas/company.schema";
 import { Tags, TagSchema } from "./schemas/tags.schema";
+import { OpenaiModule } from "src/openai/openai.module";
+import { CompanyModule } from "src/company/companies.module";
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { Tags, TagSchema } from "./schemas/tags.schema";
       { name: Tags.name, schema: TagSchema },
     ]),
     CategoriesModule,
+    OpenaiModule,
   ],
   controllers: [ProductsController, ImageUploadController, TagsController],
   providers: [

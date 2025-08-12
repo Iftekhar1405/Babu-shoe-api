@@ -6,16 +6,20 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CategoriesService } from '../categories/categories.service';
 import { Tags, TagsDocument } from './schemas/tags.schema';
+import { OpenaiService } from 'src/openai/openai.service';
+import { Company, CompanyDocument } from 'src/company/schemas/company.schema';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     @InjectModel(Tags.name) private tagsModel: Model<TagsDocument>,
+    @InjectModel(Company.name) private companyModel: Model<CompanyDocument>,
     private readonly categoriesService: CategoriesService,
+    private readonly openaiService: OpenaiService,
   ) { }
 
-  async findAll(categoryId?: string, search?: string, companyId?: string): Promise<Product[]> {
+  async findAll(categoryId?: string, search?: string, companyId?: string) {
     const filter: any = {};
 
     if (categoryId) {
@@ -27,81 +31,17 @@ export class ProductsService {
     }
 
     if (search) {
-      // Used MongoDB aggregation pipeline for optimized search
+      const queryEmbedding = await this.openaiService.generateGeminiEmbedding(search);
       const pipeline: any[] = [
-        // Lookup tags to search in tag names
         {
-          $lookup: {
-            from: 'tags',
-            localField: 'tags',
-            foreignField: '_id',
-            as: 'tagDetails'
-          }
+          $vectorSearch: {
+            index: 'vector_index',
+            path: 'embedding',
+            queryVector: queryEmbedding,
+            numCandidates: 20,
+            limit: 5,
+          },
         },
-        // Match products based on search criteria gad fat gya
-        {
-          $match: {
-            $and: [
-              // Apply category and company filters if provided
-              ...(categoryId ? [{ categoryId: new Types.ObjectId(categoryId) }] : []),
-              ...(companyId ? [{ companyId: new Types.ObjectId(companyId) }] : []),
-              // Search across multiple fields
-              {
-                $or: [
-                  { name: { $regex: search, $options: 'i' } },
-                  { articleNo: { $regex: search, $options: 'i' } },
-                  { description: { $regex: search, $options: 'i' } },
-                  { 'tagDetails.name': { $regex: search, $options: 'i' } }
-                ]
-              }
-            ]
-          }
-        },
-        // Sort by creation date (newest first)
-        { $sort: { createdAt: -1 } },
-        // Lookup category details
-        {
-          $lookup: {
-            from: 'categories',
-            localField: 'categoryId',
-            foreignField: '_id',
-            as: 'categoryId'
-          }
-        },
-        // Lookup company details
-        {
-          $lookup: {
-            from: 'companies',
-            localField: 'companyId',
-            foreignField: '_id',
-            as: 'companyId'
-          }
-        },
-        // Unwind single document fields
-        {
-          $unwind: {
-            path: '$categoryId',
-            preserveNullAndEmptyArrays: true
-          }
-        },
-        {
-          $unwind: {
-            path: '$companyId',
-            preserveNullAndEmptyArrays: true
-          }
-        },
-        // Replace tags array with populated tag details
-        {
-          $addFields: {
-            tags: '$tagDetails'
-          }
-        },
-        // Remove temporary tagDetails field
-        {
-          $project: {
-            tagDetails: 0
-          }
-        }
       ];
 
       return await this.productModel.aggregate(pipeline).exec();
@@ -114,7 +54,7 @@ export class ProductsService {
       .populate('companyId')
       .populate('tags')
       .sort({ createdAt: -1 })
-      .exec();
+      .lean(true);
   }
 
   async findOne(id: string): Promise<Product> {
@@ -144,15 +84,23 @@ export class ProductsService {
       throw new ConflictException('Product with this article number already exists');
     }
 
-    // // Convert string IDs to ObjectIds
-    // const productData = {
-    //   ...createProductDto,
-    //   companyId: createProductDto.companyId ? new Types.ObjectId(createProductDto.companyId) : undefined,
-    //   tags: createProductDto.tags?.map(tagId => new Types.ObjectId(tagId)),
-    //   categoryId: new Types.ObjectId(createProductDto.categoryId),
-    // };
-    // mongoose automatically converts to object ids based on schema
+    const company = await this.companyModel.findById(createProductDto.companyId).select('name').lean(true)
+    const tags = await this.tagsModel.find({ _id: { $in: createProductDto.tags.map(t => new Types.ObjectId(t)) } }).lean(true)
+    const category = await this.categoriesService.findOne(createProductDto.categoryId)
 
+    const textForEmbedding = JSON.stringify({
+      name: createProductDto.name,
+      description: createProductDto.description,
+      company: company.name,
+      price: createProductDto.price,
+      category: category.name,
+      articleNo: createProductDto.articleNo,
+      sizes: createProductDto.sizes,
+      tags: tags,
+      colors: createProductDto.colors
+    });
+
+    createProductDto.embedding = await this.openaiService.generateGeminiEmbedding(textForEmbedding)
 
     const createdProduct = new this.productModel(createProductDto);
     const savedProduct = await createdProduct.save();
@@ -197,6 +145,25 @@ export class ProductsService {
       ...(updateProductDto.tags && { tags: updateProductDto.tags.map(tagId => new Types.ObjectId(tagId)) }),
       ...(updateProductDto.categoryId && { categoryId: new Types.ObjectId(updateProductDto.categoryId) }),
     };
+
+
+    const company = await this.companyModel.findById(updateData.companyId).select('name').lean(true)
+    const tags = await this.tagsModel.find({ _id: { $in: updateData.tags } }).lean(true)
+    const category = await this.categoriesService.findOne(updateData.categoryId.toString())
+
+    const textForEmbedding = JSON.stringify({
+      name: updateData.name,
+      description: updateData.description,
+      company: company.name,
+      price: updateData.price,
+      category: category.name,
+      articleNo: updateData.articleNo,
+      sizes: updateData.sizes,
+      tags: tags,
+      colors: updateData.colors
+    });
+
+    updateData.embedding = await this.openaiService.generateEmbedding(textForEmbedding)
 
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, updateData, { new: true })
