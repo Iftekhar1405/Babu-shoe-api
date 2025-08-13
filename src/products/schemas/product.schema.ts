@@ -44,7 +44,7 @@ export class Product {
   @Prop({ type: [Types.ObjectId], ref: Tags.name })
   tags: Types.ObjectId[]
 
-  @Prop({ type: [Number], default: [] })
+  @Prop({ type: [Number], default: [], select: false })
   embedding: number[];
 
 }

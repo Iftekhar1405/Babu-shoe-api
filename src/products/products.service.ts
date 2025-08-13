@@ -42,9 +42,15 @@ export class ProductsService {
             limit: 5,
           },
         },
+        {
+          $project: {
+            embedding: 0, // remove embedding from results
+          }
+        }
       ];
 
-      return await this.productModel.aggregate(pipeline).exec();
+
+      return await this.productModel.aggregate(pipeline)
     }
 
     // For non-search queries, use regular find with populate
