@@ -4,10 +4,8 @@ import {
   ProductColorImage,
   ProductColorImageSchema,
 } from "./product-color-image.schema";
-import { Type } from "class-transformer";
 import { Company } from "../../company/schemas/company.schema";
 import { Tags } from "./tags.schema";
-import { compare } from "bcryptjs";
 
 export type ProductDocument = Product & Document;
 
@@ -45,6 +43,9 @@ export class Product {
 
   @Prop({ type: [Types.ObjectId], ref: Tags.name })
   tags: Types.ObjectId[]
+
+  @Prop({ type: [Number], default: [], select: false })
+  embedding: number[];
 
 }
 

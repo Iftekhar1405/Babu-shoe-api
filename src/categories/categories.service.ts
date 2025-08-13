@@ -16,7 +16,7 @@ export class CategoriesService {
   }
 
   async findOne(id: string): Promise<Category> {
-    const category = await this.categoryModel.findById(id).exec();
+    const category = await this.categoryModel.findById(id).lean(true);
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
