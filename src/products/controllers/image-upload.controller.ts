@@ -18,7 +18,13 @@ import {
   UploadImagesResponseDto,
 } from "../dto/upload-images.dto";
 import { Request } from "express";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
+import { RolesGuard } from "src/auth/guards/roles.guard";
+import { Roles } from "src/auth/decorators/roles.decorator";
+import { Role } from "src/common/enums/role.enum";
 
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 @Controller("upload")
 export class ImageUploadController {
   constructor(private readonly cloudinaryService: CloudinaryService) {}
@@ -79,6 +85,8 @@ export class ImageUploadController {
     }
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Post("images-v2")
   @UseInterceptors(FilesInterceptor("files", 100)) // Allow up to 100 images total
   async uploadImagesV2(
@@ -86,7 +94,6 @@ export class ImageUploadController {
     @Body() uploadImagesDto: UploadImagesDto,
     @Req() request: Request
   ): Promise<UploadImagesResponseDto> {
-    console.log("🪵 ~ ImageUploadController ~ uploadImagesV2 ~ uploadImagesDto:", uploadImagesDto)
     if (!uploadImagesDto.colors || uploadImagesDto.colors.length === 0) {
       throw new BadRequestException("Colors array is required");
     }
@@ -193,6 +200,8 @@ export class ImageUploadController {
   }
 
   // Legacy endpoint for backward compatibility
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Post("images-legacy")
   @UseInterceptors(FilesInterceptor("images", 10))
   async uploadImagesLegacy(
