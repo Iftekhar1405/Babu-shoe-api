@@ -10,6 +10,8 @@ import { OrderModule } from "./order/order.module";
 import { BillModule } from "./billings/billings.module";
 import { CompanyModule } from './company/companies.module';
 import { OpenaiModule } from './openai/openai.module';
+import { WhatsappService } from './whatsapp/whatsapp.service';
+import { WhatsappController } from './whatsapp/whatsapp.controller';
 
 @Module({
   imports: [
@@ -37,8 +39,8 @@ import { OpenaiModule } from './openai/openai.module';
     CompanyModule,
     OpenaiModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [WhatsappController],
+  providers: [WhatsappService],
 })
 export class AppModule {
   constructor(private usersService: UsersService) { }
