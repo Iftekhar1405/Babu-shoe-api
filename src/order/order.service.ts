@@ -37,7 +37,14 @@ export class OrderService {
       orderNumber: nextOrderNumber,
     });
 
-    return await newOrder.save();
+    const savedOrder = await newOrder.save();
+  
+  await savedOrder.populate({
+    path: "productDetails.productId",
+    select: "name articleNo -_id",
+  });
+
+  return savedOrder;
   }
 
   async findAll(): Promise<Order[]> {
@@ -55,7 +62,7 @@ export class OrderService {
     const order = await this.orderModel
       .findById(id)
       .populate("user")
-      .populate("productDetails.projectId")
+      .populate("productDetails.productId")
       .populate("address")
       .populate("shippingPartner")
       .populate("comments.user")
