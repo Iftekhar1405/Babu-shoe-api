@@ -4,6 +4,8 @@ import { Model, Types } from "mongoose";
 import { Bill, BillDocument, ProductDetail } from "./schemas/billing.schemas";
 import { Product, ProductDocument } from "src/products/schemas/product.schema";
 import { CreateBillDto } from "./dto/add-to-bill.dto";
+import { RemoveBillItemDto } from "./dto/remove-bill.dto";
+import { UpdateBillItemDto } from "./dto/update-bill-dto";
 
 @Injectable()
 export class BillService {
@@ -55,7 +57,7 @@ export class BillService {
         biller: new Types.ObjectId(userId),
         items: [newItem],
         billPrinted: false,
-        totalAmount: 0, 
+        totalAmount: 0,
       });
     }
 
@@ -63,8 +65,7 @@ export class BillService {
       (total, item) => total + item.finalPrice,
       0
     );
-
- 
+    
     const savedCart = await cart.save();
     return await this.billModel
       .findById(savedCart._id)
@@ -94,18 +95,17 @@ export class BillService {
         ],
       })
       .exec();
-
-    if (!cart) {
-      // Create new empty cart if none exists
-      cart = new this.billModel({
-        biller: new Types.ObjectId(userId),
-        items: [],
-        billPrinted: false,
-        totalAmount: 0,
-      });
-      await cart.save();
-    }
-
+      
+      if (!cart) {
+        // Create new empty cart if none exists
+        cart = new this.billModel({
+          biller: new Types.ObjectId(userId),
+          items: [],
+          billPrinted: false,
+          totalAmount: 0,
+        });
+        await cart.save();
+      }
     return cart;
   }
 
@@ -126,5 +126,98 @@ export class BillService {
     await cart.save();
 
     return cart;
+  }
+
+  async updateBillItem(userId: string, updateBillItemDto: UpdateBillItemDto) {
+    const cart = await this.billModel.findOne({
+      biller: new Types.ObjectId(userId),
+      billPrinted: false,
+    });
+
+    if (!cart) {
+      throw new NotFoundException("Cart not found");
+    }
+
+    const itemIndex = cart.items.findIndex(
+      (item) =>
+        item.productId.toString() === updateBillItemDto.productId &&
+        item.color === updateBillItemDto.color
+    );
+
+    if (itemIndex === -1) {
+      throw new NotFoundException("Item not found in cart");
+    }
+
+    // Update the item
+    if (updateBillItemDto.quantity !== undefined) {
+      cart.items[itemIndex].quantity = updateBillItemDto.quantity;
+    }
+
+    if (updateBillItemDto.discountPercent !== undefined) {
+      cart.items[itemIndex].discountPercent = updateBillItemDto.discountPercent;
+    }
+
+    // Recalculate final price
+    const item = cart.items[itemIndex];
+    const product = await this.productModel.findById(item.productId);
+    const basePrice = product.price * item.quantity;
+    item.finalPrice = basePrice * (1 - item.discountPercent / 100);
+
+    // Recalculate total amount
+    cart.totalAmount = cart.items.reduce(
+      (total, item) => total + item.finalPrice,
+      0
+    );
+
+    const savedCart = await cart.save();
+    return await this.billModel
+      .findById(savedCart._id)
+      .populate({
+        path: "items.productId",
+        populate: [
+          { path: "categoryId" },
+          { path: "companyId" },
+          { path: "tags" },
+        ],
+      })
+      .exec();
+  }
+
+  async removeBillItem(userId: string, removeBillItemDto: RemoveBillItemDto) {
+    const cart = await this.billModel.findOne({
+      biller: new Types.ObjectId(userId),
+      billPrinted: false,
+    });
+
+    if (!cart) {
+      throw new NotFoundException("Cart not found");
+    }
+
+    cart.items = cart.items.filter(
+      (item) =>
+        !(
+          item.productId.toString() === removeBillItemDto.productId &&
+          item.color === removeBillItemDto.color
+        )
+    );
+
+    // Recalculate total amount
+    cart.totalAmount = cart.items.reduce(
+      (total, item) => total + item.finalPrice,
+      0
+    );
+
+    const savedCart = await cart.save();
+    return await this.billModel
+      .findById(savedCart._id)
+      .populate({
+        path: "items.productId",
+        populate: [
+          { path: "categoryId" },
+          { path: "companyId" },
+          { path: "tags" },
+        ],
+      })
+      .exec();
   }
 }

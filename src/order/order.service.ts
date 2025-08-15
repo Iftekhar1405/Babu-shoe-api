@@ -1,52 +1,64 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
-import { Order, OrderDocument } from './schemas/order.schema';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, Types } from "mongoose";
+import { CreateOrderDto } from "./dto/create-order.dto";
+import { UpdateOrderDto } from "./dto/update-order.dto";
+import { Order, OrderDocument } from "./schemas/order.schema";
+import { User, UserDocument } from "src/users/schemas/user.schemas";
+import { AuthenticatedRequest } from "src/billings/types";
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-  ) { }
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>
+  ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+  async create(createOrderDto: CreateOrderDto, id: string): Promise<Order> {
     // Get the last order (sorted by orderNumber)
     const lastOrder = await this.orderModel
       .findOne({})
       .sort({ orderNumber: -1 })
-      .select('orderNumber')
+      .select("orderNumber")
       .lean();
 
-    const nextOrderNumber = lastOrder?.orderNumber ? lastOrder.orderNumber + 1 : 1;
+    const nextOrderNumber = lastOrder?.orderNumber
+      ? lastOrder.orderNumber + 1
+      : 1;
 
+    const user = await this.userModel.findOne({ _id: new Types.ObjectId(id) });
+    
+    const isUserAdmin = user && user.role === "admin";
+    
     const newOrder = new this.orderModel({
       ...createOrderDto,
+      name: isUserAdmin ? createOrderDto.name : user.name || "Customer",
+      user: new Types.ObjectId(user._id),
       orderNumber: nextOrderNumber,
     });
 
     return await newOrder.save();
   }
 
-
   async findAll(): Promise<Order[]> {
-    return await this.orderModel.find()
-      .populate('user')
-      .populate('productDetails.projectId')
-      .populate('address')
-      .populate('shippingPartner')
-      .populate('comments.user')
+    return await this.orderModel
+      .find()
+      .populate("user")
+      .populate("productDetails.productId")
+      .populate("address")
+      .populate("shippingPartner")
+      .populate("comments.user")
       .exec();
   }
 
   async findOne(id: string): Promise<Order> {
-    const order = await this.orderModel.findById(id)
-      .populate('user')
-      .populate('productDetails.projectId')
-      .populate('address')
-      .populate('shippingPartner')
-      .populate('comments.user')
+    const order = await this.orderModel
+      .findById(id)
+      .populate("user")
+      .populate("productDetails.projectId")
+      .populate("address")
+      .populate("shippingPartner")
+      .populate("comments.user")
       .exec();
 
     if (!order) {
@@ -57,11 +69,9 @@ export class OrderService {
   }
 
   async update(id: string, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    const updatedOrder = await this.orderModel.findByIdAndUpdate(
-      id,
-      updateOrderDto,
-      { new: true },
-    ).exec();
+    const updatedOrder = await this.orderModel
+      .findByIdAndUpdate(id, updateOrderDto, { new: true })
+      .exec();
 
     if (!updatedOrder) {
       throw new NotFoundException(`Order with id ${id} not found`);
