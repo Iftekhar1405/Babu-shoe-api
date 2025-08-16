@@ -18,7 +18,7 @@ export class OrderService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>
-  ) { }
+  ) {}
 
   async create(createOrderDto: CreateOrderDto, id: string): Promise<Order> {
     // Get the last order (sorted by orderNumber)
@@ -189,16 +189,12 @@ export class OrderService {
                     as: "item",
                     in: {
                       $multiply: [
-                        "$$item.quatity",
+                        "$$item.quatity", // or quantity if fixed in schema
+                        "$$item.amount",
                         {
-                          $multiply: [
-                            "$$item.amount",
-                            {
-                              $subtract: [
-                                1,
-                                { $divide: ["$$item.discountPercent", 100] },
-                              ],
-                            },
+                          $subtract: [
+                            1,
+                            { $divide: ["$$item.discountPercent", 100] },
                           ],
                         },
                       ],
@@ -219,6 +215,10 @@ export class OrderService {
     ]);
 
     const totalRevenue = revenueResult[0]?.totalRevenue || 0;
+    console.log(
+      "🪵 ~ OrderService ~ getOrderStats ~ totalRevenue:",
+      totalRevenue
+    );
 
     return {
       totalOrders,
