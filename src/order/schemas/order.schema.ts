@@ -37,15 +37,18 @@ export enum ORDER_RETURN_REASON {
   "others",
 }
 @Schema()
-class ProductDetail {
+export class ProductDetail {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: "Product", required: true })
   productId: Types.ObjectId;
 
   @Prop({ required: true })
-  quatity: number;
+  quantity: number;
 
   @Prop({ required: true })
   color: string;
+
+  @Prop({ required: true })
+  size: string;
 
   @Prop({ required: true })
   amount: number;
@@ -127,7 +130,7 @@ export class Order {
   @Prop({ required: false })
   paidAt?: Date;
 
-  @Prop({ type: [Comment], default: [], _id: false,  })
+  @Prop({ type: [Comment], default: [], _id: false, })
   comments: Comment[];
 }
 

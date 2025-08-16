@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get, Param, Req, Res } from '@nestjs/common';
 import { PhonePeService } from './phone-pe.service';
 
 @Controller('payments/phonepe')
-export class PaymentsController {
+export class PhonePeController {
     constructor(private readonly phonePeService: PhonePeService) { }
 
     @Post('initiate')
