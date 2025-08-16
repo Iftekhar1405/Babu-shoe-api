@@ -47,13 +47,13 @@ import { PhonePeController } from './phone-pe/phone-pe.controller';
 export class AppModule {
   constructor(private usersService: UsersService) { }
 
-  async onModuleInit() {
-    // Create default admin user on application startup
-    try {
-      await this.usersService.createAdminUser();
-      console.log("✅ Default admin user created/verified");
-    } catch (error) {
-      console.error("❌ Error creating admin user:", error.message);
-    }
-  }
+  // async onModuleInit() {
+  //   // Create default admin user on application startup
+  //   try {
+  //     await this.usersService.createAdminUser();
+  //     console.log("✅ Default admin user created/verified");
+  //   } catch (error) {
+  //     console.error("❌ Error creating admin user:", error.message);
+  //   }
+  // }
 }
