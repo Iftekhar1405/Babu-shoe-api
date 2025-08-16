@@ -17,7 +17,7 @@ export class OrderService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>
-  ) {}
+  ) { }
 
   async create(createOrderDto: CreateOrderDto, id: string): Promise<Order> {
     // Get the last order (sorted by orderNumber)
@@ -298,7 +298,7 @@ export class OrderService {
         "productDetails.productId",
         "name image description price articleNo"
       )
-      .populate("comments.user", "name email role")
+      .populate("comments.user", "name role")
       .populate("shippingPartner", "name contact")
       .exec();
 
