@@ -86,7 +86,7 @@ export class Order {
   @Prop({ required: true })
   orderNumber: number;
 
-  // @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Address', required: true })
+  // @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Address', required: true }) //will be later
   @Prop({ required: true })
   address: Types.ObjectId;
 
