@@ -16,7 +16,7 @@ import { UpdateOrderDto } from "./dto/update-order.dto";
 // import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'; // path may vary
 // import { User } from 'src/common/decorators/user.decorator'; // custom decorator
 import { Types } from "mongoose";
-import { AuthenticatedRequest } from "src/billings/types";
+import { AuthenticatedRequest } from "src/common/enums/types";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { OrderFiltersDto, UpdateOrderStatusDto } from "./types";
 
@@ -24,7 +24,7 @@ import { OrderFiltersDto, UpdateOrderStatusDto } from "./types";
 @UseGuards(JwtAuthGuard)
 // @UseGuards(JwtAuthGuard) // ✅ Apply guard globally to this controller
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(private readonly orderService: OrderService) { }
 
   @Post()
   async create(

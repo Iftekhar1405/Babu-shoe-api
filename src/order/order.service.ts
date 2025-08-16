@@ -5,7 +5,6 @@ import { CreateOrderDto } from "./dto/create-order.dto";
 import { UpdateOrderDto } from "./dto/update-order.dto";
 import { Order, OrderDocument } from "./schemas/order.schema";
 import { User, UserDocument } from "src/users/schemas/user.schemas";
-import { AuthenticatedRequest } from "src/billings/types";
 import {
   OrderFiltersDto,
   OrderStatsDto,

@@ -10,19 +10,19 @@ import {
 } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { BillService } from "./billings.services";
-import { CreateBillDto } from "./dto/add-to-bill.dto";
-import { AuthenticatedRequest } from "./types";
+import { AuthenticatedRequest } from "src/common/enums/types";
 import { UpdateBillItemDto } from "./dto/update-bill-dto";
 import { RemoveBillItemDto } from "./dto/remove-bill.dto";
+import { ProductDetail } from "./schemas/billing.schemas";
 
 @Controller("bill")
 @UseGuards(JwtAuthGuard)
 export class BillController {
-  constructor(private readonly billService: BillService) {}
+  constructor(private readonly billService: BillService) { }
 
   @Post("add")
   async addToCart(
-    @Body() createBillDto: CreateBillDto,
+    @Body() createBillDto: ProductDetail,
     @Req() req: AuthenticatedRequest
   ) {
     const userId = req.user.id;
@@ -51,11 +51,11 @@ export class BillController {
   }
 
   @Delete('remove-item')
-async removeBillItem(
-  @Body() removeBillItemDto: RemoveBillItemDto,
-  @Req() req: AuthenticatedRequest
-) {
-  const userId = req.user.id;
-  return await this.billService.removeBillItem(userId, removeBillItemDto);
-}
+  async removeBillItem(
+    @Body() removeBillItemDto: RemoveBillItemDto,
+    @Req() req: AuthenticatedRequest
+  ) {
+    const userId = req.user.id;
+    return await this.billService.removeBillItem(userId, removeBillItemDto);
+  }
 }

@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
+import { Product } from "src/products/entities/product.entity";
 
 export type BillDocument = Bill & Document;
 
 @Schema({ _id: false })
 export class ProductDetail {
-  @Prop({ type: Types.ObjectId, ref: "Product", required: true })
+  @Prop({ type: Types.ObjectId, ref: Product.name, required: true })
   productId: Types.ObjectId;
 
   @Prop({ type: Number, required: true })
@@ -14,14 +15,11 @@ export class ProductDetail {
   @Prop({ type: String })
   color?: string;
 
-  @Prop({ type: Number })
-  amount?: number;
+  @Prop({ type: String })
+  size?: string;
 
   @Prop({ type: Number, required: true })
   discountPercent: number;
-
-  @Prop({ type: Number, required: true })
-  finalPrice: number;
 
   @Prop({ type: String })
   salesPerson?: string;
