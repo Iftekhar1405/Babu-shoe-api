@@ -12,6 +12,8 @@ import { CompanyModule } from './company/companies.module';
 import { OpenaiModule } from './openai/openai.module';
 import { WhatsappService } from './whatsapp/whatsapp.service';
 import { WhatsappController } from './whatsapp/whatsapp.controller';
+import { PhonePeService } from './phone-pe/phone-pe.service';
+import { PhonePeController } from './phone-pe/phone-pe.controller';
 
 @Module({
   imports: [
@@ -39,8 +41,8 @@ import { WhatsappController } from './whatsapp/whatsapp.controller';
     CompanyModule,
     OpenaiModule,
   ],
-  controllers: [WhatsappController],
-  providers: [WhatsappService],
+  controllers: [WhatsappController, PhonePeController],
+  providers: [WhatsappService, PhonePeService],
 })
 export class AppModule {
   constructor(private usersService: UsersService) { }
