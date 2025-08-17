@@ -13,7 +13,7 @@ import { BillService } from "./billings.services";
 import { AuthenticatedRequest } from "src/common/enums/types";
 import { UpdateBillItemDto } from "./dto/update-bill-dto";
 import { RemoveBillItemDto } from "./dto/remove-bill.dto";
-import { ProductDetail } from "./schemas/billing.schemas";
+import { AddToBillDTO } from "./dto/add-to-bill.dto";
 
 @Controller("bill")
 @UseGuards(JwtAuthGuard)
@@ -22,7 +22,7 @@ export class BillController {
 
   @Post("add")
   async addToCart(
-    @Body() createBillDto: ProductDetail,
+    @Body() createBillDto: AddToBillDTO,
     @Req() req: AuthenticatedRequest
   ) {
     const userId = req.user.id;

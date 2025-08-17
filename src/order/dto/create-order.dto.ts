@@ -23,11 +23,13 @@ class ProductDetailDto {
   @IsNotEmpty()
   productId: string;
 
-
+  @IsString()
+  @IsNotEmpty()
+  size: string;
 
   @IsNumber()
   @IsNotEmpty()
-  quatity: number;
+  quantity: number;
 
   @IsString()
   @IsNotEmpty()
@@ -58,7 +60,7 @@ export class CreateOrderDto {
   @Type(() => ProductDetailDto)
   productDetails: ProductDetailDto[];
 
-    @IsString()
+  @IsString()
   @IsNotEmpty()
   name: string; // Name for Dilevery if admin create user it shoulld have the name of hte customer
 
@@ -113,5 +115,3 @@ export class CreateOrderDto {
   @Type(() => CommentDto)
   comments?: CommentDto[]; // This should be optional and will be used in future.
 }
-
-

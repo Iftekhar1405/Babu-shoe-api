@@ -6,6 +6,7 @@ import { Product, ProductDocument } from "src/products/schemas/product.schema";
 import { RemoveBillItemDto } from "./dto/remove-bill.dto";
 import { UpdateBillItemDto } from "./dto/update-bill-dto";
 import { BillItemPopulated, BillItemUnpopulated, BillWithObjectId, BillWithProducts } from "./types";
+import { AddToBillDTO } from "./dto/add-to-bill.dto";
 
 @Injectable()
 export class BillService {
@@ -14,7 +15,7 @@ export class BillService {
     @InjectModel(Product.name) private productModel: Model<ProductDocument>
   ) { }
 
-  async addToCart(userId: string, createBillDto: ProductDetail) {
+  async addToCart(userId: string, createBillDto: AddToBillDTO) {
     // Verify product exists
     const product = await this.productModel.findById(createBillDto.productId).lean();
     if (!product) throw new NotFoundException("Product not found");

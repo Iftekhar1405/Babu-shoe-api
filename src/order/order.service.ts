@@ -188,7 +188,7 @@ export class OrderService {
                     as: "item",
                     in: {
                       $multiply: [
-                        "$$item.quatity", // or quantity if fixed in schema
+                        "$$item.quantity",
                         "$$item.amount",
                         {
                           $subtract: [
