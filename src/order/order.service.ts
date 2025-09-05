@@ -11,12 +11,15 @@ import {
   PaginatedOrderResponseDto,
   UpdateOrderStatusDto,
 } from "./types";
+import { PaymentService } from "src/payment/payment.service";
+import { PaymentCurrency } from "./schemas/payment-info.enums";
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private readonly paymentService: PaymentService,
   ) { }
 
   async create(createOrderDto: CreateOrderDto, id: string): Promise<Order> {
@@ -42,7 +45,8 @@ export class OrderService {
       orderNumber: nextOrderNumber,
     });
 
-    const savedOrder = await newOrder.save();
+    const
+      savedOrder = await newOrder.save();
 
     await savedOrder.populate({
       path: "productDetails.productId",
@@ -50,6 +54,30 @@ export class OrderService {
     });
 
     return savedOrder;
+  }
+
+  async payForOrder(data: { orderId: string, id?: string }) {
+    const order = await this.orderModel.findById(data.orderId).lean();
+    if (!order) {
+      throw new NotFoundException(`Order with id ${data.orderId} not found`);
+    }
+
+    const totalAmount = order.productDetails.reduce((sum, item) => {
+      const discountFactor = 1 - (Number(item.discountPercent) || 0) / 100;
+      const lineTotal = (Number(item.amount) || 0) * (Number(item.quantity) || 0) * discountFactor;
+      return sum + lineTotal;
+    }, 0);
+
+    const amountInPaise = Math.round(totalAmount * 100);
+
+    const payment = await this.paymentService.createOrder({
+      amount: amountInPaise,
+      currency: PaymentCurrency.INR,
+      receipt: order._id.toString(),
+      notes: { orderId: String(order._id), orderNumber: order.orderNumber },
+    });
+
+    return payment;
   }
 
   async findAll(): Promise<Order[]> {

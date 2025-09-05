@@ -55,6 +55,11 @@ export class OrderController {
     return this.orderService.searchOrders(query);
   }
 
+  @Post('/pay/create-order')
+  async payForOrder(@Body() data: { orderId: string }) {
+    return await this.orderService.payForOrder(data)
+  }
+
   @Get(":id")
   async findOne(@Param("id") id: string) {
     return this.orderService.findOne(id);

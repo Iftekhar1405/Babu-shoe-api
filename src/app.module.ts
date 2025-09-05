@@ -8,22 +8,16 @@ import { UsersModule } from "./users/users.module";
 import { UsersService } from "./users/users.service";
 import { OrderModule } from "./order/order.module";
 import { BillModule } from "./billings/billings.module";
-import { CompanyModule } from './company/companies.module';
-import { OpenaiModule } from './openai/openai.module';
-import { WhatsappService } from './whatsapp/whatsapp.service';
-import { WhatsappController } from './whatsapp/whatsapp.controller';
-import { PhonePeService } from './phone-pe/phone-pe.service';
-import { PhonePeController } from './phone-pe/phone-pe.controller';
+import { CompanyModule } from "./company/companies.module";
+import { OpenaiModule } from "./openai/openai.module";
+import { WhatsappService } from "./whatsapp/whatsapp.service";
+import { WhatsappController } from "./whatsapp/whatsapp.controller";
+import { PaymentModule } from "./payment/payment.module";
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    // MongooseModule.forRoot(
-    //   process.env.MONGODB_URI ||
-    //     ""
-    // ),
+    ConfigModule.forRoot({ isGlobal: true }),
+
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -31,6 +25,7 @@ import { PhonePeController } from './phone-pe/phone-pe.controller';
       }),
       inject: [ConfigService],
     }),
+    PaymentModule,
     AuthModule,
     UsersModule,
     CategoriesModule,
@@ -38,17 +33,15 @@ import { PhonePeController } from './phone-pe/phone-pe.controller';
     OrderModule,
     BillModule,
     CompanyModule,
-    CompanyModule,
     OpenaiModule,
   ],
-  controllers: [WhatsappController, PhonePeController],
-  providers: [WhatsappService, PhonePeService],
+  controllers: [WhatsappController],
+  providers: [WhatsappService],
 })
 export class AppModule {
   constructor(private usersService: UsersService) { }
 
   // async onModuleInit() {
-  //   // Create default admin user on application startup
   //   try {
   //     await this.usersService.createAdminUser();
   //     console.log("✅ Default admin user created/verified");

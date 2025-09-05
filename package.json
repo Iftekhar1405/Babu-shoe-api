@@ -40,7 +40,7 @@
     "openai": "^5.12.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
-    "pg-sdk-node": "https://phonepe.mycloudrepo.io/public/repositories/phonepe-pg-sdk-node/releases/v2/phonepe-pg-sdk-node.tgz",
+    "razorpay": "^2.9.6",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "uuid": "^9.0.1"
