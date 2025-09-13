@@ -14,6 +14,7 @@ import { WhatsappService } from "./whatsapp/whatsapp.service";
 import { WhatsappController } from "./whatsapp/whatsapp.controller";
 import { PaymentModule } from "./payment/payment.module";
 import { IncomingOrdersModule } from './incoming-orders/incoming-orders.module';
+import { VendorsModule } from './vendors/vendors.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { IncomingOrdersModule } from './incoming-orders/incoming-orders.module';
     OpenaiModule,
     IncomingOrdersModule,
     IncomingOrdersModule,
+    VendorsModule,
   ],
   controllers: [WhatsappController],
   providers: [WhatsappService],
