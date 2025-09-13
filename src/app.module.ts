@@ -13,6 +13,7 @@ import { OpenaiModule } from "./openai/openai.module";
 import { WhatsappService } from "./whatsapp/whatsapp.service";
 import { WhatsappController } from "./whatsapp/whatsapp.controller";
 import { PaymentModule } from "./payment/payment.module";
+import { IncomingOrdersModule } from './incoming-orders/incoming-orders.module';
 
 @Module({
   imports: [
@@ -34,6 +35,8 @@ import { PaymentModule } from "./payment/payment.module";
     BillModule,
     CompanyModule,
     OpenaiModule,
+    IncomingOrdersModule,
+    IncomingOrdersModule,
   ],
   controllers: [WhatsappController],
   providers: [WhatsappService],
