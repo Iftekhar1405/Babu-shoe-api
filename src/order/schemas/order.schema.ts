@@ -128,6 +128,9 @@ export class Order {
   trackingId?: string;
 
   @Prop({ required: false })
+  totalDue?: number;
+
+  @Prop({ required: false })
   paidAt?: Date;
 
   @Prop({ type: [Comment], default: [], _id: false, })
