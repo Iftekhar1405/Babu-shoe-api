@@ -16,6 +16,7 @@ import { PaymentModule } from "./payment/payment.module";
 import { IncomingOrdersModule } from './incoming-orders/incoming-orders.module';
 import { VendorsModule } from './vendors/vendors.module';
 import { CustomerModule } from './customer/customer.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { CustomerModule } from './customer/customer.module';
     IncomingOrdersModule,
     VendorsModule,
     CustomerModule,
+    TransactionModule,
   ],
   controllers: [WhatsappController],
   providers: [WhatsappService],
