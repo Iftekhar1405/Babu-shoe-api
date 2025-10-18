@@ -127,6 +127,19 @@ export class Order {
   @Prop({ required: false })
   trackingId?: string;
 
+  // Payment tracking fields used by transactions module
+  @Prop({ required: false, default: 0 })
+  totalAmount?: number;
+
+  @Prop({ required: false, default: 0 })
+  paidAmount?: number;
+
+  @Prop({ required: false, default: 0 })
+  dueAmount?: number;
+
+  @Prop({ required: false, default: 'Due' })
+  paymentStatus?: string;
+
   @Prop({ required: false })
   totalDue?: number;
 

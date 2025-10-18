@@ -5,13 +5,15 @@ import { Transaction, TransactionDocument, TransactionType } from './schema/tran
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { ReverseTransactionDto } from './dto/reverse-transaction.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Customer, CustomerDocument } from 'src/customer/schema/customer.schema';
+import { Order, OrderDocument } from 'src/order/schemas/order.schema';
 
 @Injectable()
 export class TransactionService {
     constructor(
         @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
-        @InjectModel('Customer') private customerModel: Model<any>, // replace any with your customer document type
-        @InjectModel('Order') private orderModel: Model<any>,
+        @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>, // replace any with your customer document type
+        @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
         @InjectConnection() private readonly connection: Connection,
         private readonly eventEmitter: EventEmitter2,
     ) { }

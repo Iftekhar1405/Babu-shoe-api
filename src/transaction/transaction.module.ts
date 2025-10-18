@@ -3,11 +3,15 @@ import { TransactionService } from './transaction.service';
 import { TransactionController } from './transaction.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Transaction, TransactionSchema } from './schema/transaction.schema';
+import { Customer, CustomerSchema } from 'src/customer/schema/customer.schema';
+import { Order, OrderSchema } from 'src/order/schemas/order.schema';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Transaction.name, schema: TransactionSchema }]),
+    MongooseModule.forFeature([{ name: Customer.name, schema: CustomerSchema }]),
+    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
     EventEmitterModule,
   ],
   controllers: [TransactionController],

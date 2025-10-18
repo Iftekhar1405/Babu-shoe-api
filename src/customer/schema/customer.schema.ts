@@ -23,6 +23,10 @@ export class Customer {
     @Prop({ type: Number, default: 0 })
     creditBalance: number
 
+    // Running outstanding balance used by transactions
+    @Prop({ type: Number, default: 0 })
+    currentBalance: number
+
     @Prop({ type: String })
     address: string
 

@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { CategoriesModule } from "./categories/categories.module";
@@ -29,6 +30,7 @@ import { TransactionModule } from './transaction/transaction.module';
       }),
       inject: [ConfigService],
     }),
+    EventEmitterModule.forRoot(),
     PaymentModule,
     AuthModule,
     UsersModule,
