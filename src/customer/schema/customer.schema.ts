@@ -1,13 +1,12 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
-import { Role } from "../../common/enums/role.enum";
+import { Document, SchemaTypes, Types } from "mongoose";
 import { User } from "src/users/schemas/user.schemas";
 
 export type CustomerDocument = Customer & Document;
 
-
+@Schema({ timestamps: true })
 export class Customer {
-    @Prop({ type: Types.ObjectId, ref: User.name, required: true, })
+    @Prop({ type: SchemaTypes.ObjectId, ref: User.name, required: true, })
     userId: string;
 
     @Prop({
@@ -35,4 +34,5 @@ export class Customer {
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);
-CustomerSchema.index({ phoneNumber: 1 }, { unique: true });
+export const CustomerDbName = 'customers'
+CustomerSchema.index({ contact: 1 }, { unique: true });

@@ -15,13 +15,17 @@ export class CustomerService {
     }
 
     async create(data: Partial<Customer>) {
-        return await this.customerModel.create(data)
+        if (data.contact && !data.contact.startsWith('+91')) {
+            data.contact = '+91' + data.contact;
+        }
+        return await this.customerModel.create(data);
     }
+
 
     async findByContact(contact: string) {
         const fullContact = '+91' + contact
-
-        return await this.customerModel.findOne({ contact: fullContact }).lean(true)
+        const customer = await this.customerModel.findOne({ contact: fullContact }).populate('userId').lean(true)
+        return customer
     }
 
 }

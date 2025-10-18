@@ -1,22 +1,23 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Schema as MongooseSchema, Types } from "mongoose";
+import { Document, Schema as MongooseSchema, SchemaTypes, Types } from "mongoose";
+import { Customer } from "src/customer/schema/customer.schema";
 
 export type OrderDocument = Order & Document;
 
 export enum ORDER_STATUS {
-  "pending",
-  "confirmed",
-  "packed",
-  "dispatched",
-  "outfordeliver",
-  "delivered",
-  "cancelled",
-  "return",
+  pending = "pending",
+  confirmed = "confirmed",
+  packed = "packed",
+  dispatched = "dispatched",
+  outfordeliver = "outfordeliver",
+  delivered = "delivered",
+  cancelled = "cancelled",
+  return = "return",
 }
 
 export enum ORDER_MODE {
-  "offline",
-  "online",
+  offline = "offline",
+  online = "online",
 }
 
 export enum ORDER_PAYMENT_MODE {
@@ -35,6 +36,13 @@ export enum ORDER_RETURN_REASON {
   "damaged",
   "wrong_product",
   "others",
+}
+
+export enum ORDER_PAYMENT_STATUS {
+  Due = 'due',
+  Done = 'done',
+  Partial = 'partial',
+  Credit = 'credit'
 }
 @Schema()
 export class ProductDetail {
@@ -148,6 +156,9 @@ export class Order {
 
   @Prop({ type: [Comment], default: [], _id: false, })
   comments: Comment[];
+
+  @Prop({ type: SchemaTypes.ObjectId, ref: Customer.name })
+  customerId: string
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

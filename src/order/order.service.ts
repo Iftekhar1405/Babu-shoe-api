@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { UpdateOrderDto } from "./dto/update-order.dto";
-import { Order, OrderDocument } from "./schemas/order.schema";
+import { Order, ORDER_MODE, ORDER_PAYMENT_STATUS, ORDER_STATUS, OrderDocument } from "./schemas/order.schema";
 import { User, UserDocument } from "src/users/schemas/user.schemas";
 import {
   OrderFiltersDto,
@@ -12,7 +12,9 @@ import {
   UpdateOrderStatusDto,
 } from "./types";
 import { PaymentService } from "src/payment/payment.service";
-import { PaymentCurrency } from "./schemas/payment-info.enums";
+import { PaymentCurrency, PaymentStatus } from "./schemas/payment-info.enums";
+import { CustomerService } from "src/customer/customer.service";
+import { Role } from "src/common/enums/role.enum";
 
 @Injectable()
 export class OrderService {
@@ -20,6 +22,7 @@ export class OrderService {
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly paymentService: PaymentService,
+    private readonly customerService: CustomerService,
   ) { }
 
   async create(createOrderDto: CreateOrderDto, id: string): Promise<Order> {
@@ -34,19 +37,33 @@ export class OrderService {
       ? lastOrder.orderNumber + 1
       : 1;
 
+    if (createOrderDto.mode == ORDER_MODE.offline) {
+      createOrderDto.status = ORDER_STATUS.delivered
+      // createOrderDto.paymentStatus = ORDER_PAYMENT_STATUS.Done
+    }
     const user = await this.userModel.findOne({ _id: new Types.ObjectId(id) });
 
-    const isUserAdmin = user && user.role === "admin";
+    const isUserAdmin = user && user.role === Role.ADMIN;
+
+    let customer = await this.customerService.findByContact(createOrderDto.phoneNumber)
+
+    if (!customer) {
+      const userData = { ...createOrderDto, phoneNumber: '+91' + createOrderDto.phoneNumber, password: (createOrderDto.phoneNumber + createOrderDto.name) }
+      const user = await this.userModel.findOneAndUpdate({ phoneNumber: '+91' + createOrderDto.phoneNumber }, userData, { new: true, upsert: true, })
+
+      const customerData = { contact: user.phoneNumber, userId: user._id.toString(), address: createOrderDto.address }
+      customer = await this.customerService.create(customerData)
+    }
 
     const newOrder = new this.orderModel({
       ...createOrderDto,
       name: isUserAdmin ? createOrderDto.name : user.name || "Customer",
       user: new Types.ObjectId(user._id),
       orderNumber: nextOrderNumber,
+      customerId: customer._id
     });
 
-    const
-      savedOrder = await newOrder.save();
+    const savedOrder = await newOrder.save();
 
     await savedOrder.populate({
       path: "productDetails.productId",

@@ -82,6 +82,14 @@ export class CreateOrderDto {
   cancelationDescription?: string;
 
   @IsOptional()
+  @IsString()
+  status?: string;
+
+  @IsOptional()
+  @IsString()
+  paymentStatus?: string;
+
+  @IsOptional()
   @IsEnum(ORDER_RETURN_REASON)
   returnReason?: string;
 
