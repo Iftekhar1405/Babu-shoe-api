@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException, Inject } from '@nestjs/common';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
-import { Model, Connection, Types } from 'mongoose';
+import { Model, Connection, Types, ClientSession } from 'mongoose';
 import { Transaction, TransactionDocument, TransactionType } from './schema/transaction.schema';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { ReverseTransactionDto } from './dto/reverse-transaction.dto';
@@ -46,75 +46,79 @@ export class TransactionService {
      * - updates customer.currentBalance atomically
      * - updates order paid/due when orderId provided
      */
-    async createTransaction(dto: CreateTransactionDto, performedBy?: string) {
-        const session = await this.connection.startSession();
+    async createTransaction(dto: CreateTransactionDto, performedBy?: string, session?: ClientSession) {
+        const useExistingSession = !!session;
+        const localSession = session || await this.connection.startSession();
+
         try {
+            // If using external session, don't start a transaction here
+            if (!useExistingSession) await localSession.startTransaction();
+
             let createdTx: TransactionDocument | null = null;
 
-            await session.withTransaction(async () => {
-                // Idempotency: if key provided, try to return the existing transaction created earlier
-                if (dto.idempotencyKey) {
-                    const existing = await this.transactionModel.findOne({
-                        customerId: dto.customerId,
-                        idempotencyKey: dto.idempotencyKey,
-                    }).session(session);
-                    if (existing) {
-                        createdTx = existing;
-                        return;
-                    }
-                }
+            // --- Main transaction logic ---
+            // compute signed amount
+            const signedAmount = this.getSignedAmount(dto.type, dto.amount, dto.metadata);
 
-                // compute signed amount
-                const signedAmount = this.getSignedAmount(dto.type, dto.amount, dto.metadata);
-
-                // update customer balance atomically and fetch new balance
-                const customerUpdate = await this.customerModel.findOneAndUpdate(
-                    { _id: new Types.ObjectId(dto.customerId) },
-                    { $inc: { currentBalance: signedAmount } },
-                    { new: true, session },
-                );
-
-                if (!customerUpdate) throw new NotFoundException('Customer not found');
-
-                // enforce creditLimit if you want (optional):
-                // if (customerUpdate.creditLimit && customerUpdate.currentBalance > customerUpdate.creditLimit) {
-                //   throw new BadRequestException('Credit limit exceeded');
-                // }
-
-                // create transaction doc
-                const txObj: Partial<Transaction> = {
-                    customerId: new Types.ObjectId(dto.customerId),
-                    orderId: dto.orderId ? new Types.ObjectId(dto.orderId) : undefined,
-                    type: dto.type,
-                    amount: dto.amount,
-                    signedAmount,
-                    balanceAfter: customerUpdate.currentBalance,
-                    paymentMethod: dto.paymentMethod,
-                    remarks: dto.remarks,
+            // idempotency check
+            if (dto.idempotencyKey) {
+                const existing = await this.transactionModel.findOne({
+                    customerId: dto.customerId,
                     idempotencyKey: dto.idempotencyKey,
-                    metadata: dto.metadata,
-                };
+                }).session(localSession);
 
-                const [txDoc] = await this.transactionModel.create([txObj], { session });
-                createdTx = txDoc;
+                if (existing) return existing;
+            }
 
-                // if orderId and it's a PAYMENT or CHARGE, update the order's paid/due amounts
-                if (dto.orderId) {
-                    await this.applyToOrderInSession(dto.orderId, dto.type, dto.amount, session);
-                }
+            // update customer balance atomically
+            const customerUpdate = await this.customerModel.findOneAndUpdate(
+                { _id: new Types.ObjectId(dto.customerId) },
+                { $inc: { currentBalance: signedAmount } },
+                { new: true, session: localSession },
+            );
 
-                // emit event for listeners (analytics, notifications, integrations)
-                this.eventEmitter.emit('transaction.created', {
-                    transaction: createdTx.toObject(),
-                    performedBy,
-                });
+            if (!customerUpdate) throw new NotFoundException('Customer not found');
+
+            // create transaction doc
+            const txObj: Partial<Transaction> = {
+                customerId: new Types.ObjectId(dto.customerId),
+                orderId: dto.orderId ? new Types.ObjectId(dto.orderId) : undefined,
+                type: dto.type,
+                amount: dto.amount,
+                signedAmount,
+                balanceAfter: customerUpdate.currentBalance,
+                paymentMethod: dto.paymentMethod,
+                remarks: dto.remarks,
+                idempotencyKey: dto.idempotencyKey,
+                metadata: dto.metadata,
+            };
+
+            const [txDoc] = await this.transactionModel.create([txObj], { session: localSession });
+            createdTx = txDoc;
+
+            // if linked to order, update order's paid/due
+            if (dto.orderId) {
+                await this.applyToOrderInSession(dto.orderId, dto.type, dto.amount, localSession);
+            }
+
+            // emit event
+            this.eventEmitter.emit('transaction.created', {
+                transaction: createdTx.toObject(),
+                performedBy,
             });
 
+            // If local (not external), commit it
+            if (!useExistingSession) await localSession.commitTransaction();
+
             return createdTx;
+        } catch (err) {
+            if (!useExistingSession) await localSession.abortTransaction();
+            throw err;
         } finally {
-            session.endSession();
+            if (!useExistingSession) localSession.endSession();
         }
     }
+
 
     /**
      * Helper to update a single order inside an existing session

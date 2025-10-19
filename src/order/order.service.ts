@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
+import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import { Connection, Model, Types } from "mongoose";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { UpdateOrderDto } from "./dto/update-order.dto";
 import { Order, ORDER_MODE, ORDER_PAYMENT_STATUS, ORDER_STATUS, OrderDocument } from "./schemas/order.schema";
@@ -15,63 +15,132 @@ import { PaymentService } from "src/payment/payment.service";
 import { PaymentCurrency, PaymentStatus } from "./schemas/payment-info.enums";
 import { CustomerService } from "src/customer/customer.service";
 import { Role } from "src/common/enums/role.enum";
+import { TransactionService } from "src/transaction/transaction.service";
+import { TransactionType } from "src/transaction/schema/transaction.schema";
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectConnection() private readonly connection: Connection,
     private readonly paymentService: PaymentService,
     private readonly customerService: CustomerService,
+    private readonly txnService: TransactionService,
   ) { }
 
   async create(createOrderDto: CreateOrderDto, id: string): Promise<Order> {
-    // Get the last order (sorted by orderNumber)
-    const lastOrder = await this.orderModel
-      .findOne({})
-      .sort({ orderNumber: -1 })
-      .select("orderNumber")
-      .lean();
+    const session = await this.connection.startSession();
 
-    const nextOrderNumber = lastOrder?.orderNumber
-      ? lastOrder.orderNumber + 1
-      : 1;
+    try {
+      let savedOrder: Order | null = null;
 
-    if (createOrderDto.mode == ORDER_MODE.offline) {
-      createOrderDto.status = ORDER_STATUS.delivered
-      // createOrderDto.paymentStatus = ORDER_PAYMENT_STATUS.Done
+      await session.withTransaction(async () => {
+        // Get the last order number (within transaction)
+        const lastOrder = await this.orderModel
+          .findOne({})
+          .sort({ orderNumber: -1 })
+          .select("orderNumber")
+          .session(session)
+          .lean();
+
+        const nextOrderNumber = lastOrder?.orderNumber
+          ? lastOrder.orderNumber + 1
+          : 1;
+
+        // Set order status for offline mode
+        if (createOrderDto.mode === ORDER_MODE.offline) {
+          createOrderDto.status = ORDER_STATUS.delivered;
+          // createOrderDto.paymentStatus = ORDER_PAYMENT_STATUS.Done;
+        }
+
+        const user = await this.userModel
+          .findById(new Types.ObjectId(id))
+          .session(session);
+
+        if (!user) {
+          throw new NotFoundException('User not found');
+        }
+
+        const isUserAdmin = user.role === Role.ADMIN;
+
+        // Step 1: Find or create customer
+        let customer = await this.customerService.findByContact(createOrderDto.phoneNumber, session);
+
+        if (!customer) {
+          const userData = {
+            ...createOrderDto,
+            phoneNumber: '+91' + createOrderDto.phoneNumber,
+            password: createOrderDto.phoneNumber + createOrderDto.name,
+          };
+
+          const userDoc = await this.userModel.findOneAndUpdate(
+            { phoneNumber: '+91' + createOrderDto.phoneNumber },
+            userData,
+            { new: true, upsert: true, session },
+          );
+
+          const customerData = {
+            contact: userDoc.phoneNumber,
+            userId: userDoc._id.toString(),
+            address: createOrderDto.address,
+          };
+
+          customer = await this.customerService.create(customerData, session);
+        }
+
+        // Step 2: Compute amounts
+        const totalDue = createOrderDto.totalAmount - createOrderDto.paidAmount;
+        const paymentStatus =
+          totalDue === createOrderDto.totalAmount
+            ? ORDER_PAYMENT_STATUS.Due
+            : totalDue === 0
+              ? ORDER_PAYMENT_STATUS.Done
+              : ORDER_PAYMENT_STATUS.Partial;
+
+        // Step 3: Create the order
+        const newOrder = new this.orderModel({
+          ...createOrderDto,
+          name: isUserAdmin ? createOrderDto.name : user.name || "Customer",
+          user: user._id,
+          orderNumber: nextOrderNumber,
+          customerId: customer._id,
+          totalDue,
+          paymentStatus,
+        });
+
+        savedOrder = await newOrder.save({ session });
+
+        // Step 4: Create corresponding transaction if any due
+        const order = await this.orderModel.findOne({ orderNumber: nextOrderNumber }).populate({
+          path: "productDetails.productId",
+          select: "name articleNo -_id",
+        }).lean().session(session)
+        if (totalDue) {
+          await this.txnService.createTransaction(
+            {
+              orderId: order._id.toString(),
+              customerId: customer._id.toString(),
+              amount: totalDue,
+              type: TransactionType.CHARGE,
+            },
+            user._id.toString(),
+            session // Pass session to txnService
+          );
+        }
+
+        await order;
+      });
+
+      return savedOrder!;
+    } catch (err) {
+      console.error('❌ Transaction failed:', err);
+      throw err;
+    } finally {
+      session.endSession();
     }
-    const user = await this.userModel.findOne({ _id: new Types.ObjectId(id) });
-
-    const isUserAdmin = user && user.role === Role.ADMIN;
-
-    let customer = await this.customerService.findByContact(createOrderDto.phoneNumber)
-
-    if (!customer) {
-      const userData = { ...createOrderDto, phoneNumber: '+91' + createOrderDto.phoneNumber, password: (createOrderDto.phoneNumber + createOrderDto.name) }
-      const user = await this.userModel.findOneAndUpdate({ phoneNumber: '+91' + createOrderDto.phoneNumber }, userData, { new: true, upsert: true, })
-
-      const customerData = { contact: user.phoneNumber, userId: user._id.toString(), address: createOrderDto.address }
-      customer = await this.customerService.create(customerData)
-    }
-
-    const newOrder = new this.orderModel({
-      ...createOrderDto,
-      name: isUserAdmin ? createOrderDto.name : user.name || "Customer",
-      user: new Types.ObjectId(user._id),
-      orderNumber: nextOrderNumber,
-      customerId: customer._id
-    });
-
-    const savedOrder = await newOrder.save();
-
-    await savedOrder.populate({
-      path: "productDetails.productId",
-      select: "name articleNo -_id",
-    });
-
-    return savedOrder;
   }
+
 
   async payForOrder(data: { orderId: string, id?: string }) {
     const order = await this.orderModel.findById(data.orderId).lean();

@@ -117,6 +117,14 @@ export class CreateOrderDto {
   @IsDateString()
   paidAt?: Date;
 
+  @IsNumber()
+  @IsNotEmpty()
+  totalAmount: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  paidAmount: number;
+
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })

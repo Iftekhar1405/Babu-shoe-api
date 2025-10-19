@@ -62,6 +62,5 @@ export class Transaction {
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
 
 // Indexes: compound idempotency per customer (helps in multi-tenant/idempotent clients)
-TransactionSchema.index({ customerId: 1, idempotencyKey: 1 }, { unique: true, sparse: true });
 TransactionSchema.index({ customerId: 1, createdAt: -1 });
 TransactionSchema.index({ orderId: 1 });

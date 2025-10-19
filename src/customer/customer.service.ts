@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Customer, CustomerDocument } from './schema/customer.schema';
-import { Model } from 'mongoose';
+import { ClientSession, Model } from 'mongoose';
 
 @Injectable()
 export class CustomerService {
@@ -11,20 +11,21 @@ export class CustomerService {
     ) { }
 
     async getAll() {
-        return await this.customerModel.find().lean(true)
+        return await this.customerModel.find().populate('userId').lean(true)
     }
 
-    async create(data: Partial<Customer>) {
+    async create(data: Partial<Customer>, session?: ClientSession) {
         if (data.contact && !data.contact.startsWith('+91')) {
             data.contact = '+91' + data.contact;
         }
-        return await this.customerModel.create(data);
+        const customer = await this.customerModel.create([data], { session });
+        return customer[0]
     }
 
 
-    async findByContact(contact: string) {
+    async findByContact(contact: string, session?: ClientSession) {
         const fullContact = '+91' + contact
-        const customer = await this.customerModel.findOne({ contact: fullContact }).populate('userId').lean(true)
+        const customer = await this.customerModel.findOne({ contact: fullContact }).populate('userId').session(session).lean(true)
         return customer
     }
 
