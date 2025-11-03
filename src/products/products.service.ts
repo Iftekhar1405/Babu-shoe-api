@@ -21,7 +21,7 @@ export class ProductsService {
     @InjectModel(Company.name) private companyModel: Model<CompanyDocument>,
     private readonly categoriesService: CategoriesService,
     private readonly openaiService: OpenaiService
-  ) {}
+  ) { }
 
   async findAll(categoryId?: string, search?: string, companyId?: string) {
     const filter: any = {};
@@ -35,7 +35,7 @@ export class ProductsService {
     }
     if (search) {
       const queryEmbedding =
-        await this.openaiService.generateGeminiEmbedding(search);
+        await this.openaiService.generateEmbedding(search);
       const pipeline: any[] = [
         {
           $vectorSearch: {
@@ -121,7 +121,7 @@ export class ProductsService {
     });
 
     createProductDto.embedding =
-      await this.openaiService.generateGeminiEmbedding(textForEmbedding);
+      await this.openaiService.generateEmbedding(textForEmbedding);
 
     const createdProduct = new this.productModel(createProductDto);
     const savedProduct = await createdProduct.save();
