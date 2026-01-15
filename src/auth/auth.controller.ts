@@ -18,7 +18,7 @@ import { Response as ExpressResponse } from "express";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post("register")
   async register(
@@ -31,7 +31,7 @@ export class AuthController {
     res.cookie("access_token", result.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 300 * 24 * 60 * 60 * 1000, // 1 yr
     });
 
@@ -49,7 +49,7 @@ export class AuthController {
     res.cookie("access_token", result.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 300 * 24 * 60 * 60 * 1000, // 1 year
     });
 
